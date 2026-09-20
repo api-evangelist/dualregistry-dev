@@ -1,0 +1,81 @@
+generated: '2026-09-19'
+method: probed
+source: https://dualregistry.dev/PROMO.json
+corroboration:
+  - https://dualregistry.dev/ORPHANDUST.json
+  - https://dualregistry.dev/PRODUCT.json
+  - https://dualregistry.dev/fee_promo.json (same body as PROMO.json)
+  - https://dualregistry.dev/.well-known/x402 (priceUsd 0.50 for od_unlock_050)
+  - https://dualregistry.dev/llms.txt ("Fee / wallet / promo")
+  - live 402 on GET /api/echo?echo_id=echo_a25e7551ed53c3018600f816 (fee 2.49 USDC = 10 bps of $2,491.21; cheaper_unlock 0.50)
+checked: '2026-09-19'
+summary: >-
+  No subscription, no seats, no signup, no sales contact: one public pay-per-use tier, priced from
+  MACHINE-READABLE documents. Two ways to pay for the same thing (an open echo's unsealed legs):
+  a finder's fee in basis points of the echo's notional (promo: ask 10 bps, floor 5 bps, floor
+  $0.25, cap $250 while PROMO.active and before 2026-09-24T13:31:19Z; default afterwards: 25 bps,
+  floor 10 bps, floor $1, cap $500), negotiable through the OBO quote endpoints with a zero bond;
+  or a flat "OrphanDust" unlock credit — od_unlock_050 at $0.50 USDC per echo (the provider's
+  "preferred door"; the 402 itself recommends it when it is cheaper than the % fee), with three
+  demoted packs at $1, $3 and $5. All reads are free. Settlement is USDC on Base preferred; USDT on
+  BSC and USDC/USDT on Ethereum accepted at settle. Recorded as plan_count 1.
+plan_count: 1
+currency: USDC
+currency_note: 'USD-stable; USDC (Base, Ethereum) or USDT (BSC, Ethereum) to one receive wallet, 0x459cF7359e37B45A0d2a2479656cD96cdA9F7dBb.'
+pricing_model: usage-based-per-unlock
+plans:
+  - name: Pay per unlock (single public tier)
+    price: 0
+    currency: USDC
+    billing_period: per-unlock
+    signup: none
+    included_quota: 'all reads — index.json, stats.json, fill_hint.json, previews (?preview=1), exploratory quotes, non-open echoes in full, every static catalog'
+    overage: not-applicable
+    limits:
+      - {scope: per-IP+UA, surface: quote endpoints, window: 10 minutes, limit: 10, unit: requests}
+      - {scope: per-IP+UA, surface: POST /api/feedback, window: 10 minutes, limit: 5, unit: requests}
+    fee_schedule:
+      finder_fee_promo:
+        name: first_fill
+        active: true
+        ask_bps: 10
+        floor_bps: 5
+        floor_usdc: 0.25
+        cap_usdc: 250.0
+        window: '2026-09-17T13:31:19Z to 2026-09-24T13:31:19Z ("active=true only while now < ends_at")'
+        applies_to: new_mints_and_open_book
+        quote_bond_usdc: 0
+        worked_example: 'echo_a25e7551ed53c3018600f816, notional $2,491.21 -> quoted 2.49 USDC (10 bps) on the live 402'
+      finder_fee_default:
+        ask_bps: 25
+        floor_bps: 10
+        floor_usdc: 1.0
+        cap_usdc: 500.0
+        note: 'PROMO.json default_* fields; SCHEMA.md "Default pilot: 25 bps, floor 1 USDC, cap 500 USDC"'
+      obo_negotiation:
+        endpoints: [POST /api/quote_fee, POST /api/counter_fee, POST /api/fee_quote]
+        rules_verbatim: 'Firm (quote_bond_usdc=0): bid>=ask → HTTP 402 accept invoice; floor<=bid<ask → 200 counter; bid<floor → 422'
+        counter_rule: midpoint_ceil
+        ttl: 20 minutes
+        bond_note: 'fee_quote.schema.json still describes a $0.10 USDC bond; PROMO.json, the card and FEE_PATH.md say quote_bond_usdc=0 ("waiver code retained for compatibility"). The live documents win; recorded as 0.'
+      orphandust_skus:
+        source: https://dualregistry.dev/ORPHANDUST.json
+        preferred: od_unlock_050
+        skus:
+          - {sku: od_unlock_050, price_usdc: '0.50', credits: 1, preferred: true, note_verbatim: 'Preferred door: flat single Echo unlock'}
+          - {sku: od_credits_1, price_usdc: '1.00', credits: 1, preferred: false, note_verbatim: 'Same 1 credit as od_unlock_050 but $1.00 — prefer od_unlock_050'}
+          - {sku: od_credits_2, price_usdc: '3.00', credits: 2, preferred: false, note_verbatim: 'Demoted: $1.50/credit. Prefer 2× od_unlock_050'}
+          - {sku: od_credits_3, price_usdc: '5.00', credits: 3, preferred: false, note_verbatim: 'Demoted: $1.67/credit. Prefer 3× od_unlock_050'}
+        rails: 'USDC on Base (0x8335…2913, chain 8453) preferred; USDT on BSC (0x55d3…7955, chain 56) also accepted'
+      redeemer_bounty:
+        status: PENDING
+        note_verbatim: >-
+          Default: 10% of fee.quoted_usdc, floor 0.25 USDC, cap 25 USDC. Paid from the collected
+          finder's fee after fill — not an extra charge to the payer. Until the desk treasury holds
+          USDC, meta.redeemer_bounty_status is PENDING.
+        source: SCHEMA.md (orphan-desk-source)
+    revenue_disclosure:
+      fees_collected_proof_usdc: 0.25
+      source: 'PROMO.json fees_collected_proof_usdc; llms.txt "Proof: fees_collected_usdc_sum already $0.25 on stats"' 
+enterprise_tier: none
+free_tier: 'all reads; there is nothing to sign up for'

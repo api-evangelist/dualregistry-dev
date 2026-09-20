@@ -1,0 +1,123 @@
+generated: '2026-09-19'
+method: searched
+format: custom-json
+source: >-
+  openapi/dualregistry-dev-openapi.yml (the declared 402s — derived first), upgraded from responses
+  observed live and unauthenticated on https://dualregistry.dev on 2026-09-19 (404 echo_not_found,
+  405 method_not_allowed x4, 402 x402_payment_required x2, 200 feedback self-description), the
+  documented outcomes in https://dualregistry.dev/llms.txt and https://dualregistry.dev/fee_quote.schema.json,
+  and the refusal reasons in the provider's published handler source
+  (github.com/manhatton31-svg/orphan-desk-source, public-feed/api/_lib/negotiate.js, settle.js,
+  feedback.js, orphandust.js, rate_limit.js).
+docs: https://dualregistry.dev/llms.txt
+checked: '2026-09-19'
+summary: >-
+  Not RFC 9457. Every refusal is a plain application/json object {status: "reject", decision?:
+  "reject", reason: <snake_case token>, note: <what to send instead>, skill: <which skill the
+  route belongs to>} — the same envelope on 400, 404, 405, 422 and 429 — and the one status that
+  is not a refusal, 402, is an x402 v1 invoice (type x402_payment_required) with the price, the
+  accepts[] rail list and the exact retry instructions. The served OpenAPI declares only the 402s
+  (on three operations) and 200s; nothing else is in the contract, so the catalog below comes from
+  the wire and the provider's own source. Codes are stable snake_case tokens; the OrphanDust and
+  quote-binding checks return {ok: false, reason} without a `status` field.
+envelope:
+  shape:
+    status: '"reject" on every refusal'
+    decision: '"reject" — present on the negotiation routes only'
+    reason: 'a snake_case token to branch on'
+    note: 'a sentence naming the body or method the route expects'
+    skill: 'the agent-card skill the route belongs to (redeem, quote_fee, settle_fee, feedback, orphandust)'
+  alternate_shape: '{ok: false, reason, ...} on OrphanDust credit checks and quote-binding checks'
+  media_type: application/json; charset=utf-8
+  problem_json: false
+  request_id_header: 'none (x-vercel-id is the platform''s, not documented)'
+  cors: 'Access-Control-Allow-Origin: * on every response'
+declared_responses:
+- status: 402
+  declared_on_operations: 3
+  operations: [redeemEcho, quoteFee, buyOrphanDustCredits]
+  description_verbatim: x402 payment required / Payment required
+  observed: true
+  note: 'A price, not a decline. See problem type x402_payment_required.'
+- status: 200
+  declared_on_operations: 6
+  note: 'Bare descriptions (Echo catalog, Stats, Full Echo, Counter or indicative quote, Receipt, Credits); no schemas.'
+problem_types:
+- code: x402_payment_required
+  http_status: 402
+  observed: true
+  observed_on: ['GET /api/echo?echo_id=echo_a25e7551ed53c3018600f816', 'GET /api/orphandust/buy']
+  title: Payment required (x402 v1 invoice)
+  body: >-
+    {schema_version, type: x402_payment_required, status: 402, x402Version: 1, echo_id?, sku?,
+    amount, amount_usdc, receive_wallet, pay_to, accepts[] (scheme exact, network eip155:8453 |
+    base, maxAmountRequired, resource, payTo, asset, maxTimeoutSeconds 600, extra), preferred
+    {USDC on base, chain_id 8453, token, decimals 6}, accepted[] (USDC/base, USDT/bsc, USDC/ethereum,
+    USDT/ethereum), fee {ask_bps, floor_bps, quoted_usdc}, cheaper_unlock {sku od_unlock_050,
+    price_usdc 0.50, save_usdc}, pay_urls {...}, unlock {retry_get_with ...}, skip_feedback,
+    ai_disclosure}
+  headers: ['PAYMENT-REQUIRED (base64 x402 v1)', 'x-payment-required: true', x402-asset, x402-network, x402-pay-to, x402-price]
+  remediation_verbatim: 'After paying, retry GET with headers X-PAYMENT-TX (0x…), X-PAYMENT-CHAIN (base|bsc|ethereum), optional X-PAYMENT-ASSET (USDC|USDT), optional X-PAYMENT-AMOUNT. Or query ?tx_hash=&chain=&asset=&amount=. Server RPC-verifies Transfer to fee wallet (fail-closed) then auto settle_fee.'
+  skip_path_verbatim: 'If you skip this buy, POST /api/feedback {stage:paywall_402,outcome:too_expensive}. Do not invent a human channel.'
+- code: echo_not_found
+  http_status: 404
+  observed: true
+  observed_on: ['GET /api/echo (no echo_id)']
+  body_verbatim: '{"status": "reject", "reason": "echo_not_found", "echo_id": null, "file": null, "skill": "redeem"}'
+  remediation: Pick an echo_id from GET /index.json.
+- code: method_not_allowed
+  http_status: 405
+  observed: true
+  observed_on: ['GET /api/quote_fee', 'GET /api/counter_fee', 'GET /api/fee_quote', 'GET /api/settle_fee', 'GET /api/orphandust/unlock']
+  body_verbatim: '{"status":"reject","decision":"reject","reason":"method_not_allowed","note":"POST JSON {echo_id, bid_bps, firm?, bond_tx_hash?, bid_usdc?, agent_id?, x402_payment_intent?}","skill":"quote_fee"}'
+  note: 'The note names the expected POST body — the 405 doubles as the route''s documentation. OPTIONS answers 204.'
+- code: rate_limited
+  http_status: 429
+  observed: false
+  source: 'negotiate.js line 451; feedback.js (Retry-After); llms.txt "Rate limit ~10/10min on quote endpoints"; GET /api/feedback "5 / 10min per IP+UA"'
+  body: '{status: reject, decision: reject, reason: rate_limited, retry_after: <seconds>, note: "Max 10 OBO quote requests per 10 minutes per IP/UA. Retry after Ns.", skill}'
+  headers: ['Retry-After: <seconds>']
+  remediation: Wait retry_after seconds; the window is a fixed 10 minutes per IP+User-Agent hash.
+- code: invalid_json
+  http_status: 400
+  observed: false
+  source: negotiate.js, settle.js, orphandust/buy.js
+  remediation: Send a JSON object body with Content-Type application/json.
+- code: invalid_tx_hash
+  http_status: 400
+  observed: false
+  source: settle.js
+  route: POST /api/settle_fee
+- code: missing_echo_id
+  http_status: 400
+  observed: false
+  source: settle.js
+  route: POST /api/settle_fee
+  remediation: Send echo_id or quote_id.
+- code: bid_below_floor
+  http_status: 422
+  observed: false
+  source: 'llms.txt / FEE_PATH.md / fee_quote.schema.json description: "bid<floor → 422"'
+  route: POST /api/quote_fee
+  note: 'The docs state the status; the reason token is not published. Related reasons in negotiate.js: invalid_bid_bps, echo_not_open (status codes not stated in the docs).'
+- code: quote_not_found | quote_echo_mismatch | quote_expired | quote_not_binding | quote_amount_mismatch | quote_asset_mismatch
+  http_status: not-published
+  observed: false
+  source: 'negotiate.js (quote binding checks, returned as {ok: false, reason})'
+  route: 'GET /api/echo with X-QUOTE-ID; POST /api/settle_fee with quote_id'
+  note: 'Quotes carry a 20-minute TTL (llms.txt "Quotes TTL 20m", obo_fee.ttl_seconds 1200); quote_expired is the reason after it.'
+- code: invalid_credit_token | credit_expired | credit_exhausted
+  http_status: not-published
+  observed: false
+  source: orphandust.js
+  route: 'POST /api/orphandust/unlock; GET /api/echo?credit_token='
+- code: waiver_not_found | waiver_expired | waiver_used | waiver_agent_mismatch | one_waiver_per_agent_per_24h
+  http_status: not-published
+  observed: false
+  source: feedback.js
+  route: 'POST /api/feedback; X-BOND-WAIVER on firm quotes'
+  note: 'The bond the waiver waives is 0 (PROMO.json quote_bond_usdc 0), so these are retained-for-compatibility paths by the provider''s own note.'
+success_shapes_documented:
+  quote_fee: 'fee_quote_response (json-schema/): status|decision in [accept, counter, reject, indicative, bond_required], echo_id, ask_bps, floor_bps, bid_bps, final_bps, final_usdc, amount, receive_address, expires_at, quote_id, x402{}'
+  settle_fee: 'receipt JSON (receipt.schema.json — referenced by the card, NOT served: 404) with fee.asset, fee.collected_usd, fee.chain, fee.tx_hash'
+  feedback: 'GET self-description {ok, skill, endpoint, method, stages[7], outcomes[8], note_max 500, rate_limit, bond_waiver, hint, public_aggregate /FEEDBACK.json (404 at probe time)}'

@@ -1,0 +1,102 @@
+generated: '2026-09-19'
+method: searched
+status: candidate
+source: https://dualregistry.dev/mcp.json
+checked: '2026-09-19'
+summary: >-
+  Scro Orphan Desk publishes a file it calls mcp.json — {name orphan_desk_intent_echo, version
+  1.0.0, server https://dualregistry.dev, tools[6]} where each tool is {name, method, url} — and
+  links it from ai-plugin.json ("mcp"), robots.txt and WELLKNOWN.json. It is NOT a Model Context
+  Protocol server: no tool carries an inputSchema, there is no JSON-RPC endpoint (POST
+  https://dualregistry.dev/mcp -> 404; POST https://dualregistry.dev/ with a JSON-RPC body -> 405;
+  /.well-known/mcp.json -> 404), no initialize or tools/list can be performed, no stdio package
+  exists on npm or PyPI, and the provider's own source (github.com/manhatton31-svg/orphan-desk-source,
+  public-feed/) contains no MCP handler — mcp.json is a static file. The six "tools" are HTTP
+  operations of the REST/x402 API (five are in the served OpenAPI; feedback is documented in
+  llms.txt and the agent card but absent from the spec). Recorded as a provider-published TOOL
+  MANIFEST and a candidate tool list for an MCP server nobody ships; deployment.mode is none and
+  no MCPServer pointer is wired, because an agent cannot reach anything here over MCP.
+deployment:
+  mode: none
+  endpoint: null
+  install: null
+  package: null
+  auth: none
+  auth_note: >-
+    The HTTP operations behind the manifest need no credential; the paywalled ones answer HTTP 402
+    (x402) until a payment proof accompanies the request. There is no OAuth (no
+    /.well-known/oauth-protected-resource or oauth-authorization-server on any host — see
+    well-known/), which is consistent with a payment-gated rather than identity-gated surface.
+  verified: probed
+  probe:
+    manifest:
+      url: https://dualregistry.dev/mcp.json
+      status: 200
+      content_type: application/json; charset=utf-8
+      bytes: 793
+      saved: ../well-known/dualregistry-dev-mcp-manifest.json
+    tools_list:
+      request: 'POST https://dualregistry.dev/mcp {"jsonrpc":"2.0","id":1,"method":"tools/list"} with Accept: application/json, text/event-stream'
+      status: 404
+      body: '{"error": {"code": "404", "message": "The page could not be found"}}'
+    server_root:
+      request: 'POST https://dualregistry.dev/ (JSON-RPC body)'
+      status: 405
+    well_known_mcp:
+      url: https://dualregistry.dev/.well-known/mcp.json
+      status: 404
+    registries:
+      npm_search: 'registry.npmjs.org search "orphan-desk" and "dualregistry": no matching package'
+      pypi: 'pypi.org/pypi/orphan-desk/json: 404'
+      mcp_registry: not-listed (no entry named in any provider document)
+    checked: '2026-09-19'
+server:
+  name: orphan_desk_intent_echo
+  manifest_version: 1.0.0
+  description_verbatim: Machine-only Orphan Desk Intent Echo API with x402 payment.
+  declared_server: https://dualregistry.dev
+  transport: http
+  ai_disclosure_verbatim: Scro Orphan Desk is an AI agent desk operated for Christopher Hatton. No human support channel.
+tools:
+  - name: list_echoes
+    description: 'GET /index.json — catalog of open Intent Echoes (free)'
+    method: GET
+    url: https://dualregistry.dev/index.json
+    source_operation: openapi/dualregistry-dev-openapi.yml#listEchoes
+    input_schema: not-published
+  - name: stats
+    description: 'GET /stats.json — pheromone stats (free)'
+    method: GET
+    url: https://dualregistry.dev/stats.json
+    source_operation: openapi/dualregistry-dev-openapi.yml#getStats
+    input_schema: not-published
+  - name: redeem
+    description: 'GET /api/echo?echo_id= — HTTP 402 x402 invoice unless payment proof headers accompany the GET; ?preview=1 free'
+    method: GET
+    url: https://dualregistry.dev/api/echo
+    source_operation: openapi/dualregistry-dev-openapi.yml#redeemEcho
+    input_schema: 'not-published as a schema; query echo_id, preview, credit_token, tx_hash, chain, asset, amount and headers X-PAYMENT-TX, X-PAYMENT-CHAIN, X-PAYMENT-ASSET, X-PAYMENT-AMOUNT, X-QUOTE-ID, X-CREDIT-TOKEN are documented in llms.txt, the 402 body and vercel.json'
+  - name: quote_fee
+    description: 'POST /api/quote_fee — OBO fee quote; exploratory 200 indicative, firm accept 402 invoice'
+    method: POST
+    url: https://dualregistry.dev/api/quote_fee
+    source_operation: openapi/dualregistry-dev-openapi.yml#quoteFee
+    input_schema: json-schema/dualregistry-dev-fee-quote.schema.json (oneOf[0] quote_fee_request — the provider publishes this one)
+  - name: settle_fee
+    description: 'POST /api/settle_fee — attest a paid finder''s fee (tx_hash, chain, amount) -> receipt'
+    method: POST
+    url: https://dualregistry.dev/api/settle_fee
+    source_operation: openapi/dualregistry-dev-openapi.yml#settleFee
+    input_schema: 'not-published as a schema; body {quote_id|echo_id, tx_hash, chain, amount_usdc|amount, asset?, payer?} per the 405 note and FEE_PATH.md'
+  - name: feedback
+    description: 'POST /api/feedback — structured agent feedback {agent_id, stage, outcome, note?, echo_id?, quote_id?}'
+    method: POST
+    url: https://dualregistry.dev/api/feedback
+    source_operation: null
+    note: 'Not in the served OpenAPI. GET /api/feedback answers 200 with a self-description (stages[], outcomes[], note_max 500, rate_limit "5 / 10min per IP+UA").'
+    input_schema: 'not-published as a schema; the enumerations are served by GET /api/feedback'
+not_in_manifest:
+  note: >-
+    The agent card lists five more skills the manifest omits — counter_fee (alias of quote_fee),
+    fill_hint (GET /fill_hint.json), resurrect (legacy name of redeem), orphandust and buy_unlock
+    (GET/POST /api/orphandust/buy, POST /api/orphandust/unlock). See mcp/dualregistry-dev-tool-crosswalk.yml.

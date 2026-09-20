@@ -1,0 +1,193 @@
+generated: '2026-09-19'
+method: probed
+source: live probes of the named /.well-known/ path list on every host the record knows, 2026-09-19
+checked: '2026-09-19'
+summary: >-
+  Three hosts, one Vercel project, identical answers: the registrable domain dualregistry.dev, its
+  www., and the legacy alternate orphan-desk-echo.vercel.app (named by the agent card's
+  alternate_hosts and by llms.txt) serve the same bytes for every path probed. Of the named list,
+  ONE document is served — /.well-known/ai-plugin.json (schema_version v1, auth none, api type
+  openapi -> https://dualregistry.dev/openapi.json, an ERC-8004/A2A agent_card link and an "mcp"
+  link to /mcp.json). Beyond the list, two more first-party discovery documents were fetched and
+  saved: the x402 discovery document at /.well-known/x402 (x402Version 1, payTo wallet, one
+  priced resource, accepts[] for eip155:8453 — the provider's vercel.json rewrites it from
+  x402.json) and the A2A agent card at /.well-known/agent-card.json (registered in a2a/, byte
+  sha256 a38afd3f… on all three hosts and at the root alias /agent-card.json). Also saved from the
+  root, because the ai-plugin names it: /mcp.json, a six-entry tool MANIFEST (name, method, url)
+  and not an MCP server (see mcp/). NOT served on any host: security.txt (RFC 9116), OIDC
+  discovery, RFC 8414 / RFC 9728 OAuth metadata (there is no OAuth anywhere on this API — the
+  paywall is x402), RFC 9727 api-catalog, UCP/ACP, AAuth, the legacy /.well-known/agent.json, and
+  any apis.json / apis.yml index. Every miss is a real Vercel 404 (text/plain "The page could not
+  be found NOT_FOUND", 79 bytes); the negative control 404s the same way, so the 200s above are
+  genuine documents, not a catch-all.
+pointer_basis: >-
+  WellKnown is emitted on the strength of the served ai-plugin.json (plus the x402 and agent-card
+  documents on the same well-known prefix). SecurityTxt is NOT emitted: no security.txt on any
+  host. The agent card is registered separately as AgentCard via a2a/dualregistry-dev-a2a.yml.
+  No MCPServer pointer: /mcp.json is a manifest and POST /mcp is 404.
+host_set_note: >-
+  The website, the API baseURL, the OpenAPI servers[] entry, the docs (llms.txt, AGENT.md) and the
+  agent card all live on dualregistry.dev. There is no MCP server host (mcp.json names
+  https://dualregistry.dev as `server` and lists HTTP URLs on it; nothing answers MCP JSON-RPC).
+  No fetched document names an authorization server on any host. DNS: Cloudflare-fronted
+  (104.21.50.215 / 172.67.167.118) in front of Vercel (x-vercel-id iad1).
+path_echo_control: passed
+negative_control:
+  path: /.well-known/dualregistry-dev-negative-control-c5a0ba2d.json
+  status: 404
+  content_type: text/plain; charset=utf-8
+  bytes: 79
+  note: Same on all three hosts.
+hosts:
+  - host: https://dualregistry.dev
+    roles: [website, api, docs, a2a]
+    documents:
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /.well-known/openid-configuration
+        status: 404
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+      - path: /.well-known/oauth-protected-resource
+        status: 404
+      - path: /.well-known/api-catalog
+        status: 404
+      - path: /.well-known/api-catalog.json
+        status: 404
+      - path: /.well-known/ai-plugin.json
+        status: 200
+        file: dualregistry-dev-ai-plugin.json
+        content_type: application/json; charset=utf-8
+        bytes: 1656
+        note: >-
+          schema_version v1, name_for_model orphan_desk_intent_echo, auth {type: none}, api
+          {type: openapi, url: https://dualregistry.dev/openapi.json, note "Minimal OpenAPI stub;
+          prefer JSON endpoints below for agents"}, three skills (list_echoes, stats, resurrect),
+          agent_card and mcp links, logo_url pointing at the site root (not an image),
+          contact_email null, legal_info_url AGENT.md, updated_at 2026-09-12.
+      - path: /.well-known/ucp.json
+        status: 404
+      - path: /.well-known/acp.json
+        status: 404
+      - path: /.well-known/aauth-resource.json
+        status: 404
+      - path: /.well-known/apis.json
+        status: 404
+      - path: /apis.json
+        status: 404
+      - path: /apis.yml
+        status: 404
+      - path: /.well-known/agent-card.json             # A2A — registered in a2a/
+        status: 200
+        file: ../a2a/dualregistry-dev-agent-card.json
+        content_type: application/json; charset=utf-8
+        bytes: 16623
+        note: Graded conformant (shape) in a2a/dualregistry-dev-a2a.yml; same bytes at /agent-card.json.
+      - path: /.well-known/agent.json                  # legacy A2A path
+        status: 404
+      - path: /.well-known/x402                        # x402 discovery document (not on the named list; named by llms.txt)
+        status: 200
+        file: dualregistry-dev-x402.json
+        content_type: application/json; charset=utf-8
+        bytes: 1718
+        note: >-
+          x402Version 1, name, homepage, payTo 0x459c…7dBb, networks [eip155:8453, base], one
+          resource (POST /api/orphandust/buy, priceUsd 0.50) and two accepts[] entries (scheme
+          exact, USDC 0x8335…2913 on chain 8453, maxAmountRequired 500000, maxTimeoutSeconds 600).
+          Served by a vercel.json rewrite from /.well-known/x402.json.
+      - path: /mcp.json                                # root, not well-known; named by ai-plugin.json and robots.txt
+        status: 200
+        file: dualregistry-dev-mcp-manifest.json
+        content_type: application/json; charset=utf-8
+        bytes: 793
+        note: >-
+          A tool manifest — {name, version 1.0.0, server https://dualregistry.dev, tools[6] each
+          {name, method, url}} — with no MCP JSON-RPC endpoint behind it (POST /mcp is 404;
+          POST / is 405). Recorded here as a discovery document; see mcp/ for the reading.
+  - host: https://www.dualregistry.dev
+    roles: [website-alias]
+    note: Serves the same bytes as the apex (no redirect; HTTP 200 on the root with the same index.json body).
+    documents:
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /.well-known/openid-configuration
+        status: 404
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+      - path: /.well-known/oauth-protected-resource
+        status: 404
+      - path: /.well-known/api-catalog
+        status: 404
+      - path: /.well-known/api-catalog.json
+        status: 404
+      - path: /.well-known/ai-plugin.json
+        status: 200
+        file: dualregistry-dev-ai-plugin.json
+        note: Same 1,656-byte body as the apex.
+      - path: /.well-known/ucp.json
+        status: 404
+      - path: /.well-known/acp.json
+        status: 404
+      - path: /.well-known/aauth-resource.json
+        status: 404
+      - path: /.well-known/apis.json
+        status: 404
+      - path: /apis.json
+        status: 404
+      - path: /apis.yml
+        status: 404
+      - path: /.well-known/agent-card.json
+        status: 200
+        file: ../a2a/dualregistry-dev-agent-card.json
+        note: Same sha256 as the apex.
+      - path: /.well-known/agent.json
+        status: 404
+      - path: /.well-known/x402
+        status: 200
+        file: dualregistry-dev-x402.json
+  - host: https://orphan-desk-echo.vercel.app
+    roles: [legacy-alternate]
+    note: >-
+      The Vercel project hostname; the agent card's alternate_hosts[] and llms.txt "Alternate
+      (legacy)" name it, and the older a2aregistry.org listing (13be19e9-…, superseded) still
+      points its wellKnownURI here. Same bytes as the apex for every path probed.
+    documents:
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /.well-known/openid-configuration
+        status: 404
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+      - path: /.well-known/oauth-protected-resource
+        status: 404
+      - path: /.well-known/api-catalog
+        status: 404
+      - path: /.well-known/api-catalog.json
+        status: 404
+      - path: /.well-known/ai-plugin.json
+        status: 200
+        file: dualregistry-dev-ai-plugin.json
+        note: Same body as the apex.
+      - path: /.well-known/ucp.json
+        status: 404
+      - path: /.well-known/acp.json
+        status: 404
+      - path: /.well-known/aauth-resource.json
+        status: 404
+      - path: /.well-known/apis.json
+        status: 404
+      - path: /apis.json
+        status: 404
+      - path: /apis.yml
+        status: 404
+      - path: /.well-known/agent-card.json
+        status: 200
+        file: ../a2a/dualregistry-dev-agent-card.json
+        note: Same sha256 as the apex.
+      - path: /.well-known/agent.json
+        status: 404
+      - path: /.well-known/x402
+        status: 200
+        file: dualregistry-dev-x402.json
+hit_count: 3
+served_documents: [ai-plugin.json, agent-card.json, x402]

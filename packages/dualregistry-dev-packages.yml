@@ -1,0 +1,50 @@
+generated: '2026-09-19'
+method: searched
+source: >-
+  Registry metadata read unauthenticated on 2026-09-19 — registry.npmjs.org search for "orphan-desk"
+  and "dualregistry" (no match), pypi.org/pypi/orphan-desk/json (404) — the operator's GitHub
+  account github.com/manhatton31-svg (36 public repositories, listed via the GitHub API), the
+  provider's llms.txt, AGENT.md and agent card (no SDK, CLI or package is mentioned anywhere), and
+  the production source repository's package.json (name orphan-desk-echo, private: true,
+  dependencies {}).
+checked: '2026-09-19'
+summary:
+  first_party_package_count: 0
+  official_client_sdk_count: 0
+  third_party_package_count: 0
+  note: >-
+    No client library exists or is advertised. The desk's integration surface is HTTP-native by
+    design — JSON documents, an OpenAPI stub, an agent card, llms.txt and an x402 402 — and the
+    provider's own AGENT.md tells agents to read JSON and pay via x402, nothing more. The two
+    GitHub repositories that touch the desk are a crawlable JSON MIRROR (orphan-desk-echo: the
+    echoes, index, stats, card — "a crawlable stigmergy snapshot; always redeem against the live
+    feed") and the PRODUCTION SOURCE (orphan-desk-source: the Vercel serverless handlers,
+    package.json private with zero dependencies). Neither is a package a consumer installs. No
+    Packages or SDKs pointer is emitted.
+packages: []
+repositories:
+  - name: orphan-desk-echo
+    url: https://github.com/manhatton31-svg/orphan-desk-echo
+    role: json-mirror
+    language: null
+    license: null
+    pushed_at: '2026-09-17T08:38:27Z'
+    note: 'MIRROR.json: github_mirror, snapshot_open_echo_count 15, synced_at 2026-09-17T08:14:39Z. The card says license MIT; the repository carries no LICENSE file per the GitHub API.'
+  - name: orphan-desk-source
+    url: https://github.com/manhatton31-svg/orphan-desk-source
+    role: production-source
+    language: JavaScript
+    license: null
+    pushed_at: '2026-09-18T09:38:33Z'
+    note: 'public-feed/ is the deploy root: static JSON, .well-known/, openapi.json, mcp.json, llms.txt, vercel.json, middleware.js and api/*.js serverless handlers. package.json {name orphan-desk-echo, private true, version 1.0.0, dependencies {}, engines node >=18}. GitHub API /license -> 404.'
+  - name: stigmergic-exponential-economist
+    url: https://github.com/manhatton31-svg/stigmergic-exponential-economist/tree/main/orphan-desk-echo
+    role: origin-tree (the card''s `repository`)
+    language: Python
+    license: null
+    pushed_at: '2026-09-17T07:34:02Z'
+    note: 'A Fetch.ai uAgent repository whose orphan-desk-echo/ subtree holds an earlier copy of the feed plus HOOKS.md (integration notes for peer agents; 404 on the live host).'
+probes:
+  - {url: 'https://registry.npmjs.org/-/v1/search?text=orphan-desk&size=5', result: 'no matching package (unrelated results only)'}
+  - {url: 'https://registry.npmjs.org/-/v1/search?text=dualregistry&size=5', result: 'zero objects'}
+  - {url: 'https://pypi.org/pypi/orphan-desk/json', status: 404}

@@ -1,0 +1,102 @@
+generated: '2026-09-19'
+method: searched
+probe: true
+source: >-
+  Artifacts harvested this run (well-known/, security/, lifecycle/, conformance/), the sitemap.xml
+  (17 URLs, all machine documents; no legal page), robots.txt, https://dualregistry.dev/llms.txt,
+  https://dualregistry.dev/AGENT.md, the agent card, every JSON document's ai_disclosure field, and
+  live probes of the conventional legal and regulatory paths on dualregistry.dev on 2026-09-19.
+checked: '2026-09-19'
+harvest_only: true
+harvest_only_note: >-
+  This file records WHAT the provider publishes. It does not decide which regimes reach the
+  operator — that is the Kin Score regime map's job, not this artifact's.
+summary: >-
+  Scro Orphan Desk publishes exactly ONE of the fourteen horizontal signals, and it publishes it
+  everywhere: an AI-transparency disclosure. Every JSON document the desk serves — the catalog,
+  the stats, the previews, the 402 invoices, the promo, the SKUs, the agent card, the tool
+  manifest — carries an `ai_disclosure` field stating that the counterparty is an AI agent desk
+  operated for a named individual with no human channel, AGENT.md instructs consumers to "Honor
+  ai_disclosure", llms.txt repeats "Honor ai_disclosure on every JSON surface", and SCHEMA.md
+  makes the field REQUIRED on every Echo. That is the substance the Art. 50-style disclosure
+  regimes ask for (a person or agent is told it is dealing with an AI), delivered as a field
+  rather than a page. Everything else is absent: no terms of service, no privacy policy, no
+  accessibility statement, no subprocessor list, no DPA, no data-residency statement, no incident
+  commitment, no transparency report, no SBOM, no support-lifetime statement, no GPC statement,
+  no age signal, no notice-and-action channel and no exit/export page — /terms, /privacy,
+  /legal/*, /trust, /security, /accessibility, /transparency, /ai, /support and /contact all 404
+  (Vercel NOT_FOUND). The ai-plugin's legal_info_url points at AGENT.md, which is a consumption
+  guide, not legal text. The operator identifies themself by name in the card and every
+  disclosure; no company, jurisdiction or contact address is published.
+signals:
+  ai_transparency:
+    url: https://dualregistry.dev/.well-known/agent-card.json
+    form: 'ai_disclosure field on every served JSON document (not a page)'
+    statement_verbatim: 'Scro Orphan Desk is an AI agent desk (Christopher Hatton). Machine-only Intent Echo discovery; no email/Telegram/Discord/human channels.'
+    corroboration:
+      - {url: 'https://dualregistry.dev/AGENT.md', note: 'step 5: "Honor ai_disclosure (this is an AI agent desk)"'}
+      - {url: 'https://dualregistry.dev/llms.txt', note: '"Audience: Agents and crawlers only. Humans are not the audience. Honor ai_disclosure on every JSON surface."'}
+      - {url: 'https://dualregistry.dev/index.json', note: 'ai_disclosure on the catalog document; required on every Echo per SCHEMA.md'}
+      - {url: 'https://dualregistry.dev/api/echo?echo_id=echo_a25e7551ed53c3018600f816', note: 'ai_disclosure inside the live 402 invoice body'}
+    evidence: [{source: 'https://dualregistry.dev/.well-known/agent-card.json', keywords: [ai_disclosure, 'AI agent desk', agent_type]}]
+    note: >-
+      Recorded because the substance is there — an explicit, repeated, machine-readable statement
+      that the party is an AI agent — not because a page mentions AI. It is a disclosure OF the
+      provider's own agency, not an AI-use policy or a model card.
+absent_signals:
+  terms_and_privacy:
+    present: false
+    note: 'Neither a terms-of-service nor a privacy-policy page exists. ai-plugin legal_info_url -> /AGENT.md (a consumption guide).'
+    probes:
+      - {url: 'https://dualregistry.dev/terms', status: 404}
+      - {url: 'https://dualregistry.dev/privacy', status: 404}
+      - {url: 'https://dualregistry.dev/legal', status: 404}
+      - {url: 'https://dualregistry.dev/legal/terms', status: 404}
+      - {url: 'https://dualregistry.dev/legal/privacy', status: 404}
+  subprocessors:
+    present: false
+    note: 'No list. Observable infrastructure (Cloudflare in front, Vercel origin, chain RPC verification) is not a published subprocessor table.'
+    probes: [{url: 'https://dualregistry.dev/legal/subprocessors', status: 404}, {url: 'https://dualregistry.dev/legal/dpa', status: 404}]
+  data_subject_request:
+    present: false
+    note: 'No privacy page, no requests channel, no contact address; the desk states it has no human channel at all. The feedback endpoint captures user-agent and country headers (feedback.js captureRequestMeta) with no published notice.'
+    probes: [{url: 'https://dualregistry.dev/privacy/requests', status: 404}, {url: 'https://dualregistry.dev/contact', status: 404}]
+  data_residency:
+    present: false
+    note: 'No region or hosting statement. Settlement chains (Base, BSC, Ethereum) are published as rails, which is not residency.'
+    probes: [{url: 'https://dualregistry.dev/docs/data-residency', status: 404}]
+  incident_notification:
+    present: false
+    probes: [{url: 'https://dualregistry.dev/security', status: 404}, {url: 'https://dualregistry.dev/trust', status: 404}]
+  accessibility_conformance:
+    present: false
+    note: 'No accessibility statement; the provider states humans are not the audience.'
+    probes: [{url: 'https://dualregistry.dev/accessibility', status: 404}, {url: 'https://dualregistry.dev/accessibility/vpat', status: 404}]
+  training_data_summary:
+    present: false
+    probes: [{url: 'https://dualregistry.dev/ai', status: 404}, {url: 'https://dualregistry.dev/ai/transparency', status: 404}]
+  global_privacy_control:
+    present: false
+    note: 'No statement; not tested by header, per the rule.'
+  sbom:
+    present: false
+    note: 'Not derived (search only). The published source''s package.json declares zero dependencies, which is a fact about the repository, not an SBOM.'
+    probes: [{url: 'https://dualregistry.dev/security/sbom', status: 404}]
+  support_lifetime:
+    present: false
+    note: 'See lifecycle/: no support window, no SLA.'
+  age_assurance:
+    present: false
+  notice_and_action:
+    present: false
+    probes: [{url: 'https://dualregistry.dev/legal/report-content', status: 404}]
+  transparency_report:
+    present: false
+    probes: [{url: 'https://dualregistry.dev/transparency', status: 404}]
+  exit_assistance:
+    present: false
+    note: 'Nothing is stored for a customer that could be exported; the desk sells single unlocks.'
+adjacent_but_not_a_signal:
+  - 'robots.txt welcomes agent crawlers on every machine surface (an access statement, not a regulatory signal)'
+  - 'PROMO.json fees_collected_proof_usdc and the "EXAMPLE receipts are synthetic — not revenue" rule in AGENT.md (an honesty-about-revenue statement)'
+  - 'MIT license declared in the agent card for the mirror repository'

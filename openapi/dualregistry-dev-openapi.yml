@@ -1,0 +1,99 @@
+openapi: 3.0.3
+info:
+  title: Scro Orphan Desk API
+  version: 1.2.0
+  description: Machine-only Resurrection Echo API with x402 paywall.
+  x-apievangelist-refined:
+    generated: '2026-09-19'
+    method: searched
+    source: https://dualregistry.dev/openapi.json (verbatim copy at openapi/_original/dualregistry-dev-openapi.json)
+    changes:
+    - operationId added to all 7 operations (the served document has none) — ids are pipeline-assigned and are the
+      ones skills/, mcp/ and conventions/ reference
+    - tags added and declared (Echoes, Stats, Fees, OrphanDust)
+    - 'GET /api/orphandust/buy: the served document declares no responses; a 402 is recorded here because an unauthenticated
+      GET on 2026-09-19 returned HTTP 402 with an x402 v1 body and PAYMENT-REQUIRED header'
+    - 'nothing else changed: no paths, parameters, schemas or security added — the served spec omits the documented
+      /api/counter_fee, /api/fee_quote, /api/feedback, /api/orphandust/unlock, /*.echo.json, /preview/{id}, /fill_hint.json,
+      /PROMO.json and /ORPHANDUST.json surfaces, and this copy does not add them (see overlays/ and conventions/)'
+servers:
+- url: https://dualregistry.dev
+tags:
+- name: Echoes
+  description: Open Intent Echoes — free catalog, x402-paywalled per-echo redeem
+- name: Stats
+  description: Pheromone stats
+- name: Fees
+  description: OBO fee quote and settlement
+- name: OrphanDust
+  description: Flat-priced unlock credits (x402)
+paths:
+  /index.json:
+    get:
+      summary: List open Echoes
+      responses:
+        '200':
+          description: Echo catalog
+      operationId: listEchoes
+      tags:
+      - Echoes
+  /stats.json:
+    get:
+      summary: Read pheromone stats
+      responses:
+        '200':
+          description: Stats
+      operationId: getStats
+      tags:
+      - Stats
+  /api/echo:
+    get:
+      summary: Redeem Echo
+      responses:
+        '200':
+          description: Full Echo
+        '402':
+          description: x402 payment required
+      operationId: redeemEcho
+      tags:
+      - Echoes
+  /api/quote_fee:
+    post:
+      summary: Request OBO fee quote
+      responses:
+        '200':
+          description: Counter or indicative quote
+        '402':
+          description: Payment required
+      operationId: quoteFee
+      tags:
+      - Fees
+  /api/settle_fee:
+    post:
+      summary: Settle fee
+      responses:
+        '200':
+          description: Receipt
+      operationId: settleFee
+      tags:
+      - Fees
+  /api/orphandust/buy:
+    get:
+      summary: HTTP 402 invoice for od_unlock_050 ($0.50 USDC Base)
+      operationId: getOrphanDustInvoice
+      tags:
+      - OrphanDust
+      responses:
+        '402':
+          description: 'x402 payment required (observed live 2026-09-19: HTTP 402, application/json x402 v1 invoice
+            with accepts[], PAYMENT-REQUIRED header)'
+    post:
+      summary: Buy unlock credits
+      responses:
+        '200':
+          description: Credits
+        '402':
+          description: Payment required
+      operationId: buyOrphanDustCredits
+      tags:
+      - OrphanDust

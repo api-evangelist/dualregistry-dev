@@ -1,0 +1,120 @@
+generated: '2026-09-19'
+method: searched
+source: >-
+  openapi/dualregistry-dev-openapi.yml (live from https://dualregistry.dev/openapi.json),
+  a2a/dualregistry-dev-agent-card.json, well-known/dualregistry-dev-x402.json (live
+  /.well-known/x402), well-known/dualregistry-dev-ai-plugin.json, json-schema/dualregistry-dev-fee-quote.schema.json,
+  https://dualregistry.dev/llms.txt, live 402 responses observed on /api/echo and /api/orphandust/buy
+  (headers + body) and the /.well-known/ probes in well-known/.
+checked: '2026-09-19'
+summary: >-
+  Scro Orphan Desk conforms to the agent-payments and agent-discovery standards its market runs on
+  and declares them IN THE CONTRACT and on the wire: x402 v1 (the OpenAPI declares "402: x402
+  payment required" on three operations, /.well-known/x402 publishes the accepts[] set, and a live
+  402 carries the PAYMENT-REQUIRED header whose base64 body is the x402 v1 {x402Version, accepts[]}
+  object with scheme exact, CAIP-2 network eip155:8453, the USDC asset contract and payTo), an A2A
+  0.3.0 agent card at the canonical path (shape-conformant; no JSON-RPC door), an ERC-8004
+  registration-v1 file (off-chain only, by its own statement), CAIP-2 chain identifiers, OpenAPI
+  3.0.3, JSON Schema 2020-12 for the fee-quote messages, ai-plugin.json and llms.txt. It conforms
+  to none of the classic HTTP conventions the rubric also asks about: no OAuth 2.0 / OIDC (no
+  identity at all), no RFC 9457 problem details (a custom {status, reason, note, skill} envelope),
+  no RFC 9116 security.txt, no RFC 8594 Sunset, no IETF RateLimit headers (429 + Retry-After only),
+  no pagination or idempotency contract. No certification or compliance programme is published,
+  so no Compliance pointer is emitted.
+standards:
+- id: openapi-3.0
+  conforms: true
+  evidence: >-
+    https://dualregistry.dev/openapi.json returns "openapi": "3.0.3" anonymously — 7 operations over
+    6 paths, servers[] https://dualregistry.dev, info.title "Scro Orphan Desk API" 1.2.0. One
+    validity defect: GET /api/orphandust/buy has no responses object (required by 3.0.3); recorded
+    in the overlay, not repaired in the original.
+  location: openapi/_original/dualregistry-dev-openapi.json
+- id: x402-v1
+  conforms: true
+  domain_standard: true
+  evidence: >-
+    CONTRACT: the OpenAPI declares "402": "x402 payment required" on GET /api/echo, POST
+    /api/quote_fee and POST /api/orphandust/buy. DISCOVERY: GET https://dualregistry.dev/.well-known/x402
+    -> 200 {x402Version: 1, payTo, networks [eip155:8453, base], resources[1], accepts[2] {scheme
+    exact, network eip155:8453, maxAmountRequired "500000", asset 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
+    (USDC), payTo, maxTimeoutSeconds 600, extra {name USDC, version 2, chainId 8453}}}. WIRE:
+    GET https://dualregistry.dev/api/echo?echo_id=echo_a25e… -> HTTP 402 with header
+    PAYMENT-REQUIRED: <base64 of {"x402Version":1,"accepts":[…]}>, x-payment-required: true,
+    x402-asset USDC, x402-network eip155:8453, x402-pay-to, x402-price 0.50, and a JSON body of
+    type x402_payment_required carrying the same accepts[]. Payment proof is carried back on the
+    retry as X-PAYMENT-TX + X-PAYMENT-CHAIN (or the generic X-PAYMENT); the provider's
+    verify_payment.js RPC-verifies the ERC-20 Transfer ("fail-closed").
+  location: 'openapi/dualregistry-dev-openapi.yml#/paths/~1api~1echo/get/responses/402; well-known/dualregistry-dev-x402.json'
+  note: 'x402 v1 shape (accepts[] with maxAmountRequired), not v2. The card''s x402Support: true and x402_paywall block restate it.'
+- id: a2a-agent-card
+  conforms: true
+  domain_standard: true
+  evidence: >-
+    /.well-known/agent-card.json, protocolVersion "0.3.0", capabilities object, skills[11] —
+    grade conformant on the A2A 1.0.0 hard checks (a2a/dualregistry-dev-a2a.yml). No JSON-RPC
+    endpoint: url is the site root and POST answers 405. Conformance of the CARD, not of a door.
+  location: a2a/dualregistry-dev-agent-card.json
+- id: erc-8004-registration-v1
+  conforms: partial
+  domain_standard: true
+  evidence: >-
+    The agent card's type is https://eips.ethereum.org/EIPS/eip-8004#registration-v1 and it carries
+    the registration shape (services[] incl. agentWallet endpoints eip155:1/8453/56:0x459c…,
+    supportedTrust [reputation, crypto-economic], active, author, repository, license). The
+    provider states registration_status "off_chain_file_only" and omits registrations[] "so as not
+    to claim a fake agentId". An off-chain registration file with no on-chain identity — partial by
+    the provider's own account.
+  location: a2a/dualregistry-dev-agent-card.json
+- id: caip-2
+  conforms: true
+  evidence: 'Chain identifiers eip155:8453, eip155:1, eip155:56 in the agent card services[], the x402 accepts[] (network, extra.caip2) and the 402 bodies.'
+  location: well-known/dualregistry-dev-x402.json
+- id: json-schema-2020-12
+  conforms: true
+  evidence: 'https://dualregistry.dev/fee_quote.schema.json declares $schema https://json-schema.org/draft/2020-12/schema with $id, title, description and a oneOf of quote_fee_request / fee_quote_response. The receipt.schema.json and echo.schema.json the docs mention are not served (404).'
+  location: json-schema/dualregistry-dev-fee-quote.schema.json
+- id: ai-plugin-manifest
+  conforms: true
+  evidence: '/.well-known/ai-plugin.json, schema_version v1, api.type openapi -> openapi.json, auth none.'
+  location: well-known/dualregistry-dev-ai-plugin.json
+- id: llms-txt
+  conforms: true
+  evidence: 'https://dualregistry.dev/llms.txt — H1, blockquote summary, H2 sections with link lists; also declared as a Sitemap in robots.txt.'
+  location: llms/dualregistry-dev-llms.txt
+- id: robots-txt-agent-allowlist
+  conforms: true
+  evidence: 'robots.txt Allow: lines for every machine surface and two Sitemap: lines (llms.txt, sitemap.xml); sitemap.xml lists 17 URLs, all JSON/markdown documents.'
+- id: oauth2
+  conforms: false
+  evidence: 'No securitySchemes in the spec, no /.well-known/oauth-authorization-server or oauth-protected-resource on any host (404), no token anywhere in the docs. The API has no identity layer; x402 payment is the only gate.'
+- id: openid-connect
+  conforms: false
+  evidence: '/.well-known/openid-configuration 404 on all three hosts.'
+- id: rfc9457-problem-details
+  conforms: false
+  evidence: 'Refusals are application/json {status: reject, decision?, reason, note, skill} (observed 404 echo_not_found, 405 method_not_allowed); never application/problem+json. See errors/.'
+- id: rfc9116-security-txt
+  conforms: false
+  evidence: '/.well-known/security.txt and /security.txt 404 on every host.'
+- id: rfc8594-sunset
+  conforms: false
+  evidence: 'No Sunset or Deprecation header observed; no deprecation policy published. See lifecycle/.'
+- id: ietf-ratelimit-headers
+  conforms: false
+  evidence: 'No RateLimit-* or X-RateLimit-* header on any response; exhaustion is a 429 with Retry-After (published source negotiate.js / feedback.js). See rate-limits/.'
+- id: mcp
+  conforms: false
+  evidence: '/mcp.json is a static tool manifest; no MCP JSON-RPC endpoint (POST /mcp 404). See mcp/.'
+- id: pagination
+  conforms: not-applicable
+  evidence: 'Catalogs are served whole (count_open 6 at probe time); no page parameters anywhere.'
+- id: idempotency
+  conforms: false
+  evidence: 'No Idempotency-Key header or equivalent is documented on any write. See conventions/.'
+domain_standard_signature:
+  market: agent-to-agent payments / DeFi intent resurrection
+  declared_in_contract: ['x402-v1 (402 responses in the OpenAPI; /.well-known/x402; PAYMENT-REQUIRED header live)', 'caip-2 (network ids in accepts[])']
+  declared_in_discovery: ['a2a-agent-card (0.3.0)', 'erc-8004-registration-v1 (off-chain)']
+  not_declared: [mcp, oauth2, rfc9457]
+compliance_program: none

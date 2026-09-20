@@ -1,0 +1,133 @@
+generated: '2026-09-19'
+method: searched
+source: >-
+  The provider's published object schema SCHEMA.md (github.com/manhatton31-svg/orphan-desk-source,
+  public-feed/SCHEMA.md — "Resurrection Echo — Intent Echo schema", schema version 1.1.0) and
+  json-schema/dualregistry-dev-fee-quote.schema.json (live), read against the live documents
+  https://dualregistry.dev/index.json (echo entries), the echo_preview and x402_payment_required
+  bodies observed on /api/echo, https://dualregistry.dev/ORPHANDUST.json, PROMO.json, stats.json
+  and the agent card's obo_fee block. The served OpenAPI declares no schemas, so nothing here comes
+  from the contract; field lists are the provider's own tables and the fields the live documents
+  carry — no field is invented.
+docs: https://dualregistry.dev/llms.txt
+checked: '2026-09-19'
+notation: >-
+  The desk is a catalog of offers plus a ledger of fees. Nothing is created by a client except a
+  quote, a receipt, a credit balance and a feedback row; everything else is minted by the desk
+  from on-chain intent data. Field lists are marked by where they come from: (schema) SCHEMA.md,
+  (live) observed in a served document, (jsonschema) fee_quote.schema.json.
+shape: catalog-plus-fee-ledger
+persistence: static-json-regenerated-on-a-schedule (catalogs) + serverless state (quotes, credits, feedback)
+keying:
+  echo: 'echo_id — "Stable id, derived from order_uid (idempotent)" (schema); files are named <chain>__<order_uid>.echo.json'
+  intent: 'order_uid — the source CoW order uid, or "across:<chain>:<depositId>:<txhash>" for Across deposits (live ACROSS.json)'
+  quote: 'quote_id (prefix fq_ per FEE_PATH.md); expires_at; TTL 20 minutes'
+  credit: 'credit_token (prefix odc_) over a balance_id; sku'
+  receipt: 'rcpt_… file id (FEE_PATH.md); keyed by tx_hash + chain'
+  wallet: 'one receive address on three EVM chains — 0x459cF7359e37B45A0d2a2479656cD96cdA9F7dBb'
+entities:
+- name: Echo
+  kind: entity
+  domain: catalog
+  id: echo_id
+  created_by: 'the desk''s mint script from expired/unfilled on-chain intents (CoW watchlist; Across deposits API)'
+  fields_schema: [echo_id, order_uid, chain, owner, 'sell {symbol, address?, amount?, decimals?}', 'buy {symbol, address?, amount?, decimals?}', notional_usd, expired_at, 'why_died (thin_liquidity | ttl_too_short | limit_unmet | unknown; live also across_unfilled)', bundle_id, redeemer_bounty_usdc, 'fee {bps | flat_usdc, receive_address}', ai_disclosure, 'x402 {asset, pay_to, amount, network, decimals}', 'status (open | accepted | filled | expired | expired_echo | cancelled)', stats_url, agent_card_url, 'meta {score, explorer, pair, minted_at, desk, redeemer_bounty_status}']
+  fields_live_free_catalog: [echo_id, order_uid, path, chain, owner, pair, notional_usd, expired_at, why_died, bundle_id, redeemer_bounty_usdc, fee_quoted_usdc, fee_obo, ask_bps, floor_bps, x402, status, stats_url, agent_card_url, 'fill_hint {sell {symbol, legs_locked}, buy {symbol, legs_locked}, legs_locked: true, note}']
+  sealing: 'On the free catalogs and previews sell/buy carry symbol only (legs_locked true); address, amount and the executable fill_hint appear only after payment. Non-open echoes are served in full, free.'
+  read_by: [listEchoes (free, sealed), 'redeemEcho ?preview=1 (free, sealed)', 'redeemEcho with payment proof (full)', 'GET /fill_hint.json (free, sealed)', 'GET /SPOTLIGHT.json (one featured echo)']
+  description: A machine-readable offer to help resurrect an expired zero-fill swap intent for a disclosed finder's fee.
+- name: Intent (source)
+  kind: external-entity
+  domain: on-chain
+  id: order_uid
+  fields: [order_uid, chain, owner, sell, buy, expired_at]
+  description: 'The CoW Protocol order or Across deposit the echo was minted from; the desk holds a snapshot, the chain holds the truth.'
+- name: FeeQuote
+  kind: entity
+  domain: negotiation
+  id: quote_id
+  created_by: [quoteFee, 'POST /api/counter_fee', 'POST /api/fee_quote']
+  fields_jsonschema_request: [echo_id (required), bid_bps (required, integer >= 0), bid_usdc, agent_id, 'firm (boolean: binding vs indicative)', bond, bond_tx_hash, bond_chain, x402_payment_intent, 'action (quote_fee | counter_fee)']
+  fields_jsonschema_response: ['status / decision (accept | counter | reject | indicative | bond_required)', echo_id, final_bps, final_usdc, amount, ask_bps, floor_bps, bid_bps, receive_address, expires_at, quote_id, 'x402 {}', rule, storage]
+  rules: 'counter_rule midpoint_ceil; ttl_seconds 1200; quote_bond_usdc 0 (schema text still says $0.10 — superseded)'
+  description: 'An OBO (on-behalf-of) fee negotiation: exploratory quotes are indicative; a firm bid at or above ask becomes a 402 invoice whose quote_id binds the unlock.'
+- name: Invoice (x402 402)
+  kind: value-object
+  domain: payment
+  id: 'none — bound to echo_id or sku (+ quote_id when negotiated)'
+  fields_live: [schema_version, type x402_payment_required, status 402, x402Version 1, echo_id | sku, amount, amount_usdc, receive_wallet, pay_to, 'accepts[] {scheme, network, maxAmountRequired, resource, description, mimeType, payTo, maxTimeoutSeconds, asset, extra}', 'preferred {asset, network, chain_id, token, decimals, pay_to, amount}', 'accepted[] (USDC/base, USDT/bsc, USDC/ethereum, USDT/ethereum)', 'fee {ask_bps, floor_bps, quoted_usdc, receive_address, obo}', 'cheaper_unlock {sku, price_usdc, save_usdc, buy, unlock_after_pay, skip_feedback}', 'pay_urls {...}', 'unlock {retry_get_with, settle_fee_manual}', ai_disclosure, feedback_url]
+  description: 'The machine invoice an unpaid open-echo GET or an OrphanDust buy returns; also carried base64 in the PAYMENT-REQUIRED header.'
+- name: Payment (on-chain)
+  kind: external-entity
+  domain: payment
+  id: tx_hash + chain
+  fields: [tx_hash, 'chain (base | bsc | ethereum)', 'asset (USDC | USDT)', amount, payer]
+  verified_by: 'verify_payment.js — RPC lookup of the ERC-20 Transfer to the receive wallet, fail-closed'
+  description: 'A stablecoin transfer to 0x459c…7dBb; the proof of payment an agent presents in X-PAYMENT-TX / X-PAYMENT-CHAIN or to settleFee.'
+- name: Receipt
+  kind: entity
+  domain: settlement
+  id: rcpt_…
+  created_by: [settleFee, 'redeemEcho with payment proof (auto settle_fee)']
+  fields_documented: ['fee {asset, collected_usd | collected_usdc, chain, tx_hash}', echo_id | quote_id, 'example (false on real receipts)']
+  schema: 'receipt.schema.json — referenced by the card and FEE_PATH.md, not served (404)'
+  side_effects: 'echo status -> filled; meta.fee_collected_usdc, meta.fee_asset; stats fees_collected_usdc_sum and count_filled increment after rebuild'
+  description: 'The desk''s attestation that a finder''s fee was paid; AGENT.md: EXAMPLE receipts are synthetic templates, not revenue.'
+- name: OrphanDustSKU
+  kind: entity
+  domain: commerce
+  id: sku
+  fields_live: [sku, price_usdc, credits, preferred, note]
+  instances: [od_unlock_050 ($0.50, 1 credit, preferred), od_credits_1 ($1.00, 1), od_credits_2 ($3.00, 2, demoted), od_credits_3 ($5.00, 3, demoted)]
+  read_by: ['GET /ORPHANDUST.json', 'GET /PRODUCT.json', getOrphanDustInvoice]
+  description: A flat-priced unlock product that bypasses the basis-point fee.
+- name: CreditBalance
+  kind: entity
+  domain: commerce
+  id: balance_id (bid) + credit_token (odc_…)
+  created_by: [buyOrphanDustCredits (after payment proof)]
+  consumed_by: ['POST /api/orphandust/unlock {echo_id, credit_token}', 'redeemEcho ?credit_token=']
+  fields_source: [balance_id, sku, credits, 'expiry (credit_expired reason exists; TTL unpublished)']
+  description: One or more unlock credits bought with a SKU; one credit unseals one open echo.
+- name: Feedback
+  kind: entity
+  domain: telemetry
+  id: none published
+  created_by: ['POST /api/feedback']
+  fields_live: [agent_id, 'stage (preview | quote | bond | paywall_402 | settle | fill | skip)', 'outcome (too_expensive | legs_unclear | ttl_too_short | wrong_chain | cant_pay_x402 | filled_ok | bond_friction | other)', 'note (max 500)', echo_id, quote_id, self_compute_usdc]
+  aggregate: '/FEEDBACK.json (404 at probe time)'
+  side_effect: 'may issue a bond waiver {waiver_id, ttl 7d, uses 1} — moot at bond 0'
+  description: Structured signal an agent leaves when it walks away from, or completes, a paywall.
+- name: Promo
+  kind: value-object
+  domain: pricing
+  fields_live: [active, name, bps, ask_bps, floor_bps, floor_usdc, cap_usdc, default_bps, default_floor_bps, default_floor_usdc, default_cap_usdc, applies_to, starts_at, ends_at, receive_wallet, fees_collected_proof_usdc, quote_bond_usdc, 'bond_waiver {via, applies_to, ttl_days, uses, max_issuance_per_agent_24h, header, body_field}', 'orphandust {catalog, product, flat_unlock_usdc}']
+  read_by: ['GET /PROMO.json', 'GET /fee_promo.json']
+- name: Stats (pheromone)
+  kind: value-object
+  domain: telemetry
+  fields_live: [desk, audience, updated_at, count_open, 'count_by_chain {arbitrum, ethereum}', notional_usd_sum_open, 'spotlight {echo_id, pair, selection, reason}', open_book_filter, 'named_majors [DAI, USDC, USDT, WBTC, WETH]', index_url, agent_card_url, ai_disclosure]
+  read_by: [getStats]
+relationships:
+- {from: Echo, to: Intent (source), type: belongs_to, via: order_uid}
+- {from: Echo, to: FeeQuote, type: has_many, via: echo_id}
+- {from: FeeQuote, to: Invoice (x402 402), type: has_one, via: 'quote_id (firm accept)'}
+- {from: Echo, to: Invoice (x402 402), type: has_one, via: 'echo_id (unpaid open GET)'}
+- {from: OrphanDustSKU, to: Invoice (x402 402), type: has_one, via: sku}
+- {from: Invoice (x402 402), to: Payment (on-chain), type: has_one, via: 'payTo + amount; proof by tx_hash + chain'}
+- {from: Payment (on-chain), to: Receipt, type: has_one, via: tx_hash}
+- {from: Receipt, to: Echo, type: belongs_to, via: 'echo_id (status -> filled)'}
+- {from: Payment (on-chain), to: CreditBalance, type: has_one, via: 'sku purchase -> credit_token'}
+- {from: CreditBalance, to: Echo, type: unlocks, via: 'credit_token (one credit per echo)'}
+- {from: Feedback, to: Echo, type: belongs_to, via: 'echo_id (optional)'}
+- {from: Feedback, to: FeeQuote, type: belongs_to, via: 'quote_id (optional)'}
+- {from: Promo, to: FeeQuote, type: parameterises, via: ask_bps / floor_bps / floor_usdc / cap_usdc}
+- {from: Stats (pheromone), to: Echo, type: aggregates, via: count_open / notional_usd_sum_open / spotlight}
+enumerations:
+  echo_status: [open, accepted, filled, expired, expired_echo, cancelled]
+  why_died: [thin_liquidity, ttl_too_short, limit_unmet, unknown, 'across_unfilled (live)']
+  quote_status: [accept, counter, reject, indicative, bond_required]
+  chains: ['ethereum (eip155:1)', 'base (eip155:8453)', 'bsc (eip155:56)', 'arbitrum (catalog only; settlement rails are the three above)']
+  assets: [USDC, USDT]
+  feedback_stage: [preview, quote, bond, paywall_402, settle, fill, skip]
+  feedback_outcome: [too_expensive, legs_unclear, ttl_too_short, wrong_chain, cant_pay_x402, filled_ok, bond_friction, other]

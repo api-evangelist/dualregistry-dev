@@ -1,0 +1,123 @@
+generated: '2026-09-19'
+method: searched
+source: >-
+  openapi/dualregistry-dev-openapi.yml, https://dualregistry.dev/llms.txt, https://dualregistry.dev/AGENT.md,
+  the agent card (obo_fee, x402_paywall), https://dualregistry.dev/fee_quote.schema.json,
+  https://dualregistry.dev/PROMO.json, https://dualregistry.dev/ORPHANDUST.json, response headers and
+  bodies observed live and unauthenticated on dualregistry.dev on 2026-09-19, and the provider's
+  published source (github.com/manhatton31-svg/orphan-desk-source: FEE_PATH.md, SCHEMA.md,
+  vercel.json, api/_lib/*.js).
+checked: '2026-09-19'
+summary: >-
+  A contract written for agents and priced per request: no authentication, every free document
+  self-describing (desk, audience, schema_version, updated_at, ai_disclosure, stats_url,
+  agent_card_url on each), the paid surface behind a uniform x402 HTTP 402 whose body tells the
+  caller the price, the rails, the retry headers, a cheaper alternative and what to POST if it
+  walks away. Idempotency is NONE — no idempotency key on any write, and the writes are on-chain
+  payments verified by transaction hash. Reversibility is NONE — no cancel, refund, void or undo
+  exists anywhere; the only time bounds are expiries (a 20-minute quote TTL, a 600-second invoice
+  timeout, each echo's expired_at) and an expiry is not a reversal. What the provider offers
+  instead, and documents well, is rehearsal before commitment: ?preview=1 on the paid GET and
+  exploratory (non-firm) quotes are free.
+authentication:
+  style: none
+  paid_surface: x402 v1 payment proof on retry (X-PAYMENT-TX + X-PAYMENT-CHAIN), quote_id binding, or an OrphanDust credit_token
+  see: authentication/dualregistry-dev-authentication.yml
+versioning:
+  api: none-in-path
+  api_detail: 'Paths are /api/<name> and root JSON files; info.version 1.2.0; every document carries its own schema_version. No header or date versioning; no deprecation markers.'
+  see: lifecycle/dualregistry-dev-lifecycle.yml
+idempotency:
+  coverage: none
+  mechanism: null
+  header: null
+  scope: []
+  scope_count: 0
+  write_surface_count: 5
+  write_surface: [quoteFee (POST /api/quote_fee, /api/counter_fee, /api/fee_quote), settleFee (POST /api/settle_fee), buyOrphanDustCredits (POST /api/orphandust/buy), 'POST /api/orphandust/unlock (documented only)', 'POST /api/feedback (documented only)']
+  retention: not-applicable
+  not_covered: >-
+    No Idempotency-Key header, no client request id, no documented replay behaviour on any write.
+    The nearest thing is structural: echo_id is "derived from order_uid (idempotent)" (SCHEMA.md) —
+    that is the minting of the catalog, not a client write — and a payment is identified by its
+    on-chain tx_hash, so submitting the same proof twice references the same transfer; whether the
+    server treats a second settle_fee for the same tx_hash as a no-op is not published.
+  agent_guidance: >-
+    Treat every POST as at-most-once on your side. A firm quote that timed out may still have
+    produced a quote_id and a 402 invoice — do not re-fire it; a payment you cannot confirm should
+    be looked up on-chain by tx_hash before you pay again, because the transfer is final either way.
+dry_run_mode:
+  available: partial
+  detail: >-
+    Two published rehearsal modes, both free: (1) GET /api/echo?echo_id=…&preview=1 (or
+    /preview/{echo_id}) returns the echo_preview object — pair, notional, expiry, fee ask/floor,
+    quoted_usdc, the x402 block and legs_locked stubs — for the exact echo the paid GET would
+    unseal ("Free preview: ?preview=1"); (2) POST /api/quote_fee with firm false or omitted returns
+    a 200 indicative ask/floor instead of a binding 402 invoice ("Exploratory (no firm): 200
+    indicative ask/floor"). Neither rehearses the settlement itself; there is no test network and
+    no test wallet — every payment is mainnet USDC/USDT.
+  operations: [redeemEcho (preview=1), quoteFee (firm=false)]
+  source: https://dualregistry.dev/llms.txt
+reversibility:
+  grade: none
+  grade_basis: >-
+    No reversal operation exists for any write surface: nothing cancels a firm quote (it expires
+    after 20 minutes), nothing refunds or voids a paid finder's fee or an OrphanDust credit
+    purchase (the payment is an on-chain ERC-20 transfer the server verifies and then serves
+    against), nothing un-spends a credit, nothing withdraws feedback. No window is stated because
+    no reversal is offered. Expiries are recorded below for what they are.
+  write_surface_count: 5
+  reversal_operations: []
+  expiries_not_reversals:
+    - {write: quoteFee (firm), expiry: '20 minutes — "Quotes TTL 20m", obo_fee.ttl_seconds 1200; quote_expired reason afterwards', docs: 'https://dualregistry.dev/llms.txt'}
+    - {write: x402 invoice (402), expiry: 'maxTimeoutSeconds 600 in accepts[]', docs: 'https://dualregistry.dev/.well-known/x402'}
+    - {write: OrphanDust credit, expiry: 'credit_expired reason exists (orphandust.js); TTL not published', docs: 'https://dualregistry.dev/ORPHANDUST.json'}
+    - {write: bond waiver, expiry: '7 days, 1 use', docs: 'https://dualregistry.dev/PROMO.json'}
+  irreversible:
+    - {write: settleFee / paid redeemEcho, note: 'a stablecoin transfer to the receive wallet; the desk marks the echo filled and returns a receipt — no refund path is published'}
+    - {write: buyOrphanDustCredits, note: 'same — a paid SKU; credits are the receipt'}
+    - {write: 'POST /api/orphandust/unlock', note: 'consumes one credit and returns the legs; no un-spend'}
+    - {write: 'POST /api/feedback', note: 'appended to an aggregate; no delete'}
+  agent_guidance: >-
+    Decide before you pay. Use the free preview and the exploratory quote to establish that the
+    echo is the one you want, that its expired_at leaves you time, and that the fee (or the $0.50
+    flat unlock the 402 itself recommends as "cheaper_unlock") is acceptable — then pay once. The
+    provider's own escape hatch for a 402 you decline is not a reversal but a signal: POST
+    /api/feedback {stage: paywall_402, outcome: too_expensive}.
+pagination:
+  style: none
+  detail: 'Catalogs are served whole (index.json count_open 6, fill_hint.json count_open 6 at probe time; the open-book gate keeps them small: notional >= $2k, named majors only, future TTL). No limit/offset/cursor anywhere.'
+field_expansion:
+  style: sealing-by-payment
+  detail: 'The free catalogs carry sell/buy SYMBOLS only with legs_locked: true; the full legs (address, amount, decimals) and the executable fill_hint appear only in the paid body. Non-open echoes (filled/expired/unfillable) are served in full, free.'
+metadata:
+  per_document: [desk, audience ("agents"), schema_version, updated_at | at, receive_wallet, stats_url, agent_card_url, ai_disclosure, note]
+  note: 'Every JSON document, including error and 402 bodies, restates ai_disclosure. AGENT.md step 5: "Honor ai_disclosure".'
+request_tracing:
+  response_header: none documented
+  observed: 'x-vercel-id and cf-ray (platform headers) only'
+  documented: false
+error_envelope:
+  shape: '{status: reject, decision?: reject, reason: <snake_case>, note: <expected input>, skill: <skill>}'
+  media_type: application/json
+  problem_json: false
+  catalog: errors/dualregistry-dev-problem-types.yml
+rate_limiting:
+  headers: []
+  exhaustion: '429 + Retry-After + body {reason: rate_limited, retry_after}'
+  published: '~10 / 10 min on quote endpoints; 5 / 10 min on feedback (per IP+User-Agent hash)'
+  see: rate-limits/dualregistry-dev-rate-limits.yml
+caching:
+  json_documents: 'Cache-Control: public, max-age=30; ETag and Last-Modified present (index.json)'
+  api_routes: 'Cache-Control: no-store'
+  source: vercel.json (published) and observed headers
+cors:
+  allow_origin: '*'
+  allow_methods: 'GET, POST, OPTIONS on /api/*'
+  allow_headers: 'Content-Type, Accept, X-PAYMENT, X-PAYMENT-TX, X-PAYMENT-CHAIN, X-PAYMENT-ASSET, X-PAYMENT-AMOUNT, X-PAYMENT-PAYER, X-QUOTE-ID, PAYMENT-TX, PAYMENT-CHAIN, X-BOND-WAIVER, X-CREDIT-TOKEN'
+money_units:
+  rule: 'Amounts on the desk''s own fields are decimal strings in USD-stable units ("2.49", "0.50"); the x402 accepts[].maxAmountRequired is the integer atomic form ("500000" = 0.50 USDC at 6 decimals). USDT on BSC has 18 decimals (accepted[] states decimals per rail).'
+  fee_math: 'ask_bps / floor_bps of notional_usd; promo floor $0.25 / cap $250; default floor $1 / cap $500 (PROMO.json)'
+audience:
+  verbatim: 'Agents and crawlers only. Humans are not the audience. Honor ai_disclosure on every JSON surface.'
+  no_human_channel: true

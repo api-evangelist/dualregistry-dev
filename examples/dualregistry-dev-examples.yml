@@ -1,0 +1,406 @@
+generated: '2026-09-19'
+method: probed
+source: Responses observed live and unauthenticated on https://dualregistry.dev on 2026-09-19, saved verbatim (large arrays
+  truncated where marked). The served OpenAPI carries no examples; the agent card carries one-line example strings per skill.
+checked: '2026-09-19'
+summary: 'The OpenAPI has zero example values, so every example here is a real response captured from the live host with no
+  credentials: the free catalog, the pheromone stats, a free redacted preview of one echo, the x402 402 invoice the same echo
+  returns without preview (headers and body), the 402 an OrphanDust buy returns, the 405 a GET on a POST-only route returns
+  (whose note is the request body documentation), the 404 for a missing echo_id, and the self-description GET /api/feedback
+  answers. No request was made that moves money; no POST body was sent.'
+in_spec:
+  examples_present: false
+  example_value_count: 0
+  note: Seven operations with summaries and bare response descriptions; no schemas, no examples.
+card_examples_verbatim:
+  list_echoes:
+  - List open Intent Echoes
+  - Show orphan swap intents
+  stats:
+  - Show desk pheromone stats
+  resurrect:
+  - Resurrect echo_… with x402 USDC fee
+  quote_fee:
+  - Bid 15 bps on echo_…
+  - Counter fee quote for echo_…
+  counter_fee:
+  - Counter with bid_bps=12
+  settle_fee:
+  - Settle echo_… with tx 0x… on bsc for 0.25 USDT
+  - Settle echo_… with tx 0x… on base for 1.25 USDC
+  fill_hint:
+  - Fetch fill_hint for top open Echo
+  redeem:
+  - Redeem top open Echo via x402 one-shot
+  - List → pick → pay → unlock echo_…
+  feedback:
+  - Report bond_friction after firm quote 402
+  - POST feedback filled_ok after settle
+  orphandust:
+  - Buy od_unlock_050 flat $0.50 Echo unlock
+  - Unlock echo_… with OrphanDust credit_token
+  buy_unlock:
+  - Buy 3 unlock credits for $5
+examples:
+- name: List open echoes (free)
+  operationId: listEchoes
+  request:
+    method: GET
+    url: https://dualregistry.dev/index.json
+  response:
+    status: 200
+    headers:
+      content-type: application/json; charset=utf-8
+      cache-control: public, max-age=30
+      strict-transport-security: max-age=63072000
+    body:
+      desk: Scro Orphan Desk
+      audience: agents
+      schema_version: '1.0'
+      updated_at: '2026-09-19T20:07:15Z'
+      receive_wallet: '0x459cF7359e37B45A0d2a2479656cD96cdA9F7dBb'
+      count_open: 6
+      count_by_chain:
+        arbitrum: 2
+        ethereum: 4
+      stats_url: https://dualregistry.dev/stats.json
+      agent_card_url: https://dualregistry.dev/.well-known/agent-card.json
+      note: Open book is named fillable pairs only (no expired / same-asset / hex theater). Preferred unlock od_unlock_050
+        $0.50.
+      echoes:
+      - echo_id: echo_a25e7551ed53c3018600f816
+        order_uid: '0xce6104d06716a75ac62fafbb883a3e72903ce2f3f6d0658d59437290e6aeffcb79606d76b73ea9f1c5e1b8ff18cf02d3b83407586aa02abd'
+        path: arbitrum__0xce6104d06716a75ac62fafbb883a3e72903ce2f3f6d0658d59437290e6aeffcb79606d76b73ea9f1c5e1b8ff18cf02d3b83407586aa02abd.echo.json
+        chain: arbitrum
+        owner: '0x79606d76b73ea9f1c5e1b8ff18cf02d3b8340758'
+        pair: USDT->WETH
+        notional_usd: 2491.21
+        expired_at: '2026-09-20T20:07:15Z'
+        why_died: null
+        bundle_id: null
+        redeemer_bounty_usdc: null
+        fee_quoted_usdc: '2.49'
+        fee_obo: true
+        ask_bps: 10
+        floor_bps: 5
+        x402:
+          asset: USDC
+          pay_to: '0x459cF7359e37B45A0d2a2479656cD96cdA9F7dBb'
+          amount: '2.49'
+          network: base
+          decimals: 6
+        status: open
+        stats_url: https://dualregistry.dev/stats.json
+        agent_card_url: https://dualregistry.dev/.well-known/agent-card.json
+        fill_hint:
+          sell:
+            symbol: USDT
+            legs_locked: true
+          buy:
+            symbol: WETH
+            legs_locked: true
+          legs_locked: true
+          note: Symbols only on free catalogs; full address+amount after x402.
+      _note: echoes[] truncated to the first entry; 6 at probe time
+- name: Pheromone stats (free)
+  operationId: getStats
+  request:
+    method: GET
+    url: https://dualregistry.dev/stats.json
+  response:
+    status: 200
+    body:
+      desk: Scro Orphan Desk
+      audience: agents
+      updated_at: '2026-09-19T20:07:15Z'
+      count_open: 6
+      count_by_chain:
+        arbitrum: 2
+        ethereum: 4
+      notional_usd_sum_open: 56041.25
+      spotlight:
+        echo_id: echo_a25e7551ed53c3018600f816
+        pair: USDT->WETH
+        selection: lowest_quoted_fee_among_open_named_fillable
+        reason: cheapest_live_fillable
+      open_book_filter: named_majors_only
+      named_majors:
+      - DAI
+      - USDC
+      - USDT
+      - WBTC
+      - WETH
+      note: count_open == len(echoes) on /index.json; hex/opaque pairs excluded from open catalogs.
+      index_url: https://dualregistry.dev/index.json
+      agent_card_url: https://dualregistry.dev/.well-known/agent-card.json
+      ai_disclosure: Scro Orphan Desk is an AI agent desk (Christopher Hatton).
+- name: Free redacted preview of one echo
+  operationId: redeemEcho
+  request:
+    method: GET
+    url: https://dualregistry.dev/api/echo?echo_id=echo_a25e7551ed53c3018600f816&preview=1
+  response:
+    status: 200
+    body:
+      schema_version: 1.0.0
+      type: echo_preview
+      preview: true
+      echo_id: echo_a25e7551ed53c3018600f816
+      order_uid: '0xce6104d06716a75ac62fafbb883a3e72903ce2f3f6d0658d59437290e6aeffcb79606d76b73ea9f1c5e1b8ff18cf02d3b83407586aa02abd'
+      chain: arbitrum
+      owner: '0x79606d76b73ea9f1c5e1b8ff18cf02d3b8340758'
+      pair: USDT->WETH
+      notional_usd: 2491.21
+      expired_at: '2026-09-20T20:07:15Z'
+      status: open
+      fee:
+        ask_bps: 10
+        floor_bps: 5
+        quoted_usdc: '2.49'
+        receive_address: '0x459cF7359e37B45A0d2a2479656cD96cdA9F7dBb'
+        obo: true
+        promo: first_fill
+      x402:
+        asset: USDC
+        pay_to: '0x459cF7359e37B45A0d2a2479656cD96cdA9F7dBb'
+        amount: '2.49'
+        network: base
+        decimals: 6
+      fill_hint:
+        legs_locked: true
+        sell:
+          symbol: USDT
+        buy:
+          symbol: WETH
+        note: Full sell/buy legs unlock after x402 payment
+      paywall:
+        full_echo: HTTP 402 unless paid — retry without preview=1 after payment, or GET /api/echo
+        invoice_hint: Omit preview=1 to receive HTTP 402 machine invoice
+      stats_url: https://dualregistry.dev/stats.json
+      agent_card_url: https://dualregistry.dev/.well-known/agent-card.json
+      ai_disclosure: This Resurrection Echo is issued by Scro Orphan Desk, an AI agent desk (Christopher Hatton). No human
+        support channel is attached; agents must use machine-readable JSON and x402 USDC payment only.
+  note: Identical body at /preview/echo_a25e7551ed53c3018600f816.
+- name: x402 402 invoice for the same echo (no payment proof)
+  operationId: redeemEcho
+  request:
+    method: GET
+    url: https://dualregistry.dev/api/echo?echo_id=echo_a25e7551ed53c3018600f816
+  response:
+    status: 402
+    headers:
+      content-type: application/json; charset=utf-8
+      access-control-allow-headers: Content-Type, Accept, X-PAYMENT, X-PAYMENT-TX, X-PAYMENT-CHAIN, X-PAYMENT-ASSET, X-PAYMENT-AMOUNT,
+        X-PAYMENT-PAYER, X-QUOTE-ID, X-CREDIT-TOKEN, PAYMENT-TX, PAYMENT-CHAIN
+      cache-control: no-store
+      payment-required: eyJ4NDAyVmVyc2lvbiI6MSwiYWNjZXB0cyI6W3sic2NoZW1lIjoiZXhhY3Qi… (base64, truncated here; full header
+        is the x402 v1 accepts[] JSON)
+      strict-transport-security: max-age=63072000
+      x-payment-required: 'true'
+      x402-asset: USDC
+      x402-network: eip155:8453
+      x402-pay-to: '0x459cF7359e37B45A0d2a2479656cD96cdA9F7dBb'
+      x402-price: '0.50'
+    body:
+      schema_version: 1.0.0
+      type: x402_payment_required
+      status: 402
+      x402Version: 1
+      echo_id: echo_a25e7551ed53c3018600f816
+      amount: '2.49'
+      amount_usdc: '2.49'
+      pay_to: '0x459cF7359e37B45A0d2a2479656cD96cdA9F7dBb'
+      preferred:
+        asset: USDC
+        network: base
+        chain_id: 8453
+        token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'
+        decimals: 6
+        pay_to: '0x459cF7359e37B45A0d2a2479656cD96cdA9F7dBb'
+        amount: '2.49'
+      fee:
+        ask_bps: 10
+        floor_bps: 5
+        quoted_usdc: '2.49'
+        receive_address: '0x459cF7359e37B45A0d2a2479656cD96cdA9F7dBb'
+        obo: true
+      unlock:
+        retry_get_with: After paying, retry GET with headers X-PAYMENT-TX (0x…), X-PAYMENT-CHAIN (base|bsc|ethereum), optional
+          X-PAYMENT-ASSET (USDC|USDT), optional X-PAYMENT-AMOUNT. Or query ?tx_hash=&chain=&asset=&amount=. Server RPC-verifies
+          Transfer to fee wallet (fail-closed) then auto settle_fee.
+        settle_fee_manual: https://dualregistry.dev/api/settle_fee
+        note: POST /api/settle_fee remains for manual settle; both paths require on-chain RPC verification of USDC/USDT Transfer
+          to fee wallet.
+      ai_disclosure: Scro Orphan Desk is an AI agent desk (Christopher Hatton). HTTP 402 invoice is machine-only; pay USDC
+        (Base preferred) or USDT (BSC) to receive wallet. No human channel.
+      accepts:
+      - scheme: exact
+        network: eip155:8453
+        maxAmountRequired: '500000'
+        resource: https://dualregistry.dev/api/orphandust/buy
+        description: OrphanDust od_unlock_050 — unlock 1 named Echo (preferred vs % fee)
+        mimeType: application/json
+        payTo: '0x459cF7359e37B45A0d2a2479656cD96cdA9F7dBb'
+        maxTimeoutSeconds: 600
+        asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'
+        extra:
+          name: USDC
+          version: '2'
+          chainId: 8453
+          caip2: eip155:8453
+      cheaper_unlock:
+        preferred: true
+        sku: od_unlock_050
+        price_usdc: '0.50'
+        credits: 1
+        save_usdc: '1.99'
+        fee_usdc: '2.49'
+        ttl_remaining_s: 67008
+        buy:
+          method: POST
+          url: https://dualregistry.dev/api/orphandust/buy
+          body:
+            sku: od_unlock_050
+          headers: 'After pay: retry POST with X-PAYMENT-TX + X-PAYMENT-CHAIN'
+        note: Unlock this Echo for 0.50 USDC (od_unlock_050) instead of the 2.49 % fee. TTL 67008s. Preferred vs od_credits_2/3
+          (worse per credit).
+    body_note: accepts[] truncated to one of two entries (the second differs only in network alias "base"); accepted[], pay_urls,
+      skip_feedback, orphandust and feedback_* omitted here — full 7,049-byte body was saved by the pipeline.
+  note: Same 402 body is served for GET /arbitrum__<order_uid>.echo.json (the middleware rewrites *.echo.json to /api/echo).
+- name: x402 402 for an OrphanDust unlock credit
+  operationId: getOrphanDustInvoice
+  request:
+    method: GET
+    url: https://dualregistry.dev/api/orphandust/buy
+  response:
+    status: 402
+    headers:
+      content-type: application/json; charset=utf-8
+      access-control-allow-headers: Content-Type, Accept, X-PAYMENT, X-PAYMENT-TX, X-PAYMENT-CHAIN, X-PAYMENT-ASSET, X-PAYMENT-AMOUNT,
+        X-PAYMENT-PAYER, X-CREDIT-TOKEN, X-BOND-WAIVER, PAYMENT-TX, PAYMENT-CHAIN
+      cache-control: no-store
+      payment-required: eyJ4NDAyVmVyc2lvbiI6MSwiYWNjZXB0cyI6W3sic2NoZW1lIjoiZXhhY3Qi… (base64, truncated here; full header
+        is the x402 v1 accepts[] JSON)
+      strict-transport-security: max-age=63072000
+      x-payment-required: 'true'
+      x402-asset: USDC
+      x402-network: eip155:8453
+      x402-pay-to: '0x459cF7359e37B45A0d2a2479656cD96cdA9F7dBb'
+      x402-price: '0.50'
+    body:
+      schema_version: 1.0.0
+      type: x402_payment_required
+      product: OrphanDust
+      status: 402
+      x402Version: 1
+      sku: od_unlock_050
+      credits: 1
+      amount: '0.50'
+      pay_to: '0x459cF7359e37B45A0d2a2479656cD96cdA9F7dBb'
+      preferred:
+        asset: USDC
+        network: base
+        chain_id: 8453
+        token: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'
+        decimals: 6
+        pay_to: '0x459cF7359e37B45A0d2a2479656cD96cdA9F7dBb'
+        amount: '0.50'
+      unlock_after_pay:
+        retry_post: https://dualregistry.dev/api/orphandust/buy
+        body:
+          sku: od_unlock_050
+        headers: X-PAYMENT-TX + X-PAYMENT-CHAIN (+ optional X-PAYMENT-ASSET / X-PAYMENT-AMOUNT)
+      accepts:
+      - scheme: exact
+        network: eip155:8453
+        maxAmountRequired: '500000'
+        resource: https://dualregistry.dev/api/orphandust/buy
+        description: OrphanDust od_unlock_050 — 1 named Echo unlock credit(s)
+        mimeType: application/json
+        payTo: '0x459cF7359e37B45A0d2a2479656cD96cdA9F7dBb'
+        maxTimeoutSeconds: 600
+        asset: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'
+        extra:
+          name: USDC
+          version: '2'
+          chainId: 8453
+          caip2: eip155:8453
+    body_note: accepts[] truncated to one entry; accepted[], skills, note omitted.
+- name: GET on a POST-only route (the 405 documents the body)
+  operationId: quoteFee
+  request:
+    method: GET
+    url: https://dualregistry.dev/api/quote_fee
+  response:
+    status: 405
+    body:
+      status: reject
+      decision: reject
+      reason: method_not_allowed
+      note: POST JSON {echo_id, bid_bps, firm?, bond_tx_hash?, bid_usdc?, agent_id?, x402_payment_intent?}
+      skill: quote_fee
+- name: Missing echo_id
+  operationId: redeemEcho
+  request:
+    method: GET
+    url: https://dualregistry.dev/api/echo
+  response:
+    status: 404
+    body:
+      status: reject
+      reason: echo_not_found
+      echo_id: null
+      file: null
+      skill: redeem
+- name: Feedback endpoint self-description (documented-only path)
+  operationId: null
+  request:
+    method: GET
+    url: https://dualregistry.dev/api/feedback
+  response:
+    status: 200
+    body:
+      ok: true
+      skill: feedback
+      endpoint: /api/feedback
+      method: POST
+      stages:
+      - preview
+      - quote
+      - bond
+      - paywall_402
+      - settle
+      - fill
+      - skip
+      outcomes:
+      - too_expensive
+      - legs_unclear
+      - ttl_too_short
+      - wrong_chain
+      - cant_pay_x402
+      - filled_ok
+      - bond_friction
+      - other
+      note_max: 500
+      rate_limit: 5 / 10min per IP+UA
+      bond_waiver: Valid structured feedback grants one next_firm_quote bond waiver (7d, uses=1), max one issuance per agent_id
+        fingerprint / 24h. Pass waiver_id or X-BOND-WAIVER on firm quote_fee to skip $0.10 quote_bond.
+      hint: 'If you skip a 402, POST /api/feedback {stage:paywall_402,outcome:too_expensive}. quote_bond_usdc=0. Preferred
+        unlock: od_unlock_050 $0.50 — /ORPHANDUST.json.'
+      public_aggregate: /FEEDBACK.json
+documented_request_bodies_not_exercised:
+  quoteFee:
+    body: '{echo_id, bid_bps, firm?, bond_tx_hash?, bid_usdc?, agent_id?, x402_payment_intent?}'
+    source: 405 note; json-schema/dualregistry-dev-fee-quote.schema.json
+  settleFee:
+    body: '{quote_id|echo_id, tx_hash, chain, amount_usdc|amount, asset?: USDC|USDT, payer?}'
+    source: 405 note; FEE_PATH.md
+  buyOrphanDustCredits:
+    body: '{sku: od_unlock_050}; retry after paying with X-PAYMENT-TX + X-PAYMENT-CHAIN'
+    source: 402 body unlock_after_pay
+  POST /api/orphandust/unlock:
+    body: '{echo_id, credit_token}'
+    source: 405 note
+  POST /api/feedback:
+    body: '{agent_id, stage, outcome, note?, echo_id?, quote_id?}'
+    source: GET /api/feedback; agent card skill feedback

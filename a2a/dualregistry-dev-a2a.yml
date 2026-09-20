@@ -1,0 +1,172 @@
+generated: '2026-09-19'
+method: probed
+source: https://dualregistry.dev/.well-known/agent-card.json
+checked: '2026-09-19'
+discovery:
+  path: /.well-known/agent-card.json
+  canonical: true
+  host: dualregistry.dev
+  note: >-
+    Served at the canonical A2A path on the registrable domain, and byte-identical (sha256
+    a38afd3f765a5ee689cd4a1d5b2e468b695834290bdd001e14e5f5e434b4a39c, 16,623 bytes) at the root
+    alias https://dualregistry.dev/agent-card.json, on https://www.dualregistry.dev at the canonical
+    path, and on the legacy host https://orphan-desk-echo.vercel.app. The legacy
+    /.well-known/agent.json path is a 404 on every host. The card is named by llms.txt ("Well-known
+    agent card: A2A discovery mirror"), by ai-plugin.json (agent_card), by robots.txt and the
+    sitemap, by every JSON surface's agent_card_url field, and by the card's own wellKnownURI.
+    Ownership is not in question: the card's provider.organization and homepage are the desk and
+    this host, and the same Vercel project (github.com/manhatton31-svg/orphan-desk-source,
+    public-feed/.well-known/agent-card.json) publishes it.
+  dual_role: >-
+    The same document is the desk's ERC-8004 off-chain registration file — its `type` is
+    https://eips.ethereum.org/EIPS/eip-8004#registration-v1, and registration_status is
+    "off_chain_file_only" with the note "No on-chain agentId is claimed; registrations[] omitted
+    intentionally (no fake agentId)". The A2A fields sit beside the ERC-8004 ones in one object.
+conformance:
+  spec: A2A 1.0.0
+  grade: conformant
+  grade_basis: >-
+    All three hard checks pass: `capabilities` is an OBJECT ({streaming: false, pushNotifications:
+    false, stateTransitionHistory: false}), a top-level `protocolVersion` is present ("0.3.0"),
+    and `skills` is an ARRAY of 11 entries each carrying id, name, description, tags, examples,
+    inputModes and outputModes. `url`, `version`, `name`, `description`, `provider`,
+    `documentationUrl`, `defaultInputModes` and `defaultOutputModes` are all present. The one
+    optional field the rubric names that is missing is `preferredTransport`. Graded on shape, as
+    the rubric asks; the interpretation below says what the shape does and does not correspond to.
+  protocol_version: '0.3.0'
+  preferred_transport: null
+  interfaces: []
+  deviations:
+    - id: no-preferredTransport
+      severity: soft
+      detail: 'preferredTransport is absent and there is no additionalInterfaces[]; nothing in the card says JSONRPC, GRPC or HTTP+JSON.'
+    - id: url-is-not-an-a2a-endpoint
+      severity: soft-but-material
+      detail: >-
+        `url` is "https://dualregistry.dev/" — the site root. GET on it answers the echo catalog
+        (the same JSON as /index.json); POST with a JSON-RPC body answers HTTP 405 with an empty
+        body. No message/send, tasks/get or any JSON-RPC method is served anywhere the card or the
+        docs point. The card is a discovery document for an HTTP+x402 API, not the address of an
+        A2A door — and the provider says as much: the `services[]` entry named "A2A" points at the
+        card itself, and every skill's `endpoint` is a plain HTTP GET/POST URL.
+    - id: no-securitySchemes
+      severity: soft
+      detail: 'No securitySchemes or security. Consistent with the API: there is no authentication; the x402 paywall (declared in x402Support and x402_paywall) is the access control.'
+    - id: non-standard-skill-keys
+      severity: soft
+      detail: 'Skills carry provider-invented `endpoint`, `method` and (on redeem) `flow[]` keys next to the standard ones. Harmless to a 1.0.0 reader; useful to an agent.'
+    - id: non-standard-top-level-keys
+      severity: soft
+      detail: >-
+        ~25 non-A2A top-level keys: the ERC-8004 registration set (type, agent_type, active,
+        services[], endpoints[], supportedTrust, registration_status, registration_note, author,
+        wellKnownURI, homepage, repository, license, skill_ids) plus desk fields (desk, operator,
+        public_feed, receive_wallet, x402Support, ai_disclosure, obo_fee, alternate_hosts,
+        alternate_note, first_fill_promo, x402_paywall, updatedAt, updated_at_iso). None are
+        namespaced as A2A extensions.
+    - id: version-drift
+      severity: soft
+      detail: 'Card version 1.2.0 matches the OpenAPI info.version 1.2.0; the sibling /mcp.json says 1.0.0.'
+  extensions_declared: []
+  method_surface_note: >-
+    The GRADE is about the card's shape. Probed on 2026-09-19 without credentials: GET
+    https://dualregistry.dev/ -> 200 application/json (the echo catalog); POST
+    https://dualregistry.dev/ {"jsonrpc":"2.0","id":1,"method":"tasks/get",...} -> 405, empty
+    body. No JSON-RPC A2A method routes. The skills the card lists ARE live as plain HTTP:
+    GET /index.json 200, GET /stats.json 200, GET /api/echo?echo_id=… 402 (x402 invoice),
+    GET /api/echo?…&preview=1 200, POST-only /api/quote_fee, /api/counter_fee, /api/settle_fee,
+    /api/orphandust/unlock answer 405 to GET with a JSON note naming the expected body, GET
+    /api/feedback 200 (self-description), GET/POST /api/orphandust/buy 402. Streaming and push
+    notifications are declared false and nothing contradicts that.
+card:
+  name: Scro Orphan Desk
+  description: >-
+    Intent Echo resurrection desk: indexes expired zero-fill CoW (and similar) intents as
+    machine-readable Resurrection Echoes. Agents list open named-pair echoes (free index), redeem
+    via one-shot x402 paywall (HTTP 402 on per-echo GET), negotiate OBO fees, and unlock
+    receipt+fill. First-fill promo ask 10 bps / floor 5 bps / $0.25. AI agent — no human support
+    channels. OrphanDust preferred door: od_unlock_050 $0.50 / 1 credit (packs demoted).
+    quote_bond_usdc=0.
+  url: https://dualregistry.dev/
+  version: 1.2.0
+  documentation_url: https://dualregistry.dev/llms.txt
+  provider: {organization: Scro Orphan Desk, url: 'https://dualregistry.dev/'}
+  capabilities: {streaming: false, push_notifications: false, state_transition_history: false}
+  default_input_modes: [application/json, text/plain]
+  default_output_modes: [application/json]
+  security_schemes: []
+  skills: 11
+  file: dualregistry-dev-agent-card.json
+  license: MIT
+  repository: https://github.com/manhatton31-svg/stigmergic-exponential-economist/tree/main/orphan-desk-echo
+  updated_at: '2026-09-17T21:53:08Z'
+skills:
+  - {id: list_echoes, name: List Echoes, tags: [defi, cow, intent, catalog, free], http: 'GET /index.json'}
+  - {id: stats, name: Stats, tags: [stats, stigmergy, free], http: 'GET /stats.json'}
+  - {id: resurrect, name: Resurrect, tags: [x402, defi, redeem], http: 'GET /*.echo.json | /api/echo?echo_id= (402 unless paid; ?preview=1 free)', note: legacy name for redeem}
+  - {id: quote_fee, name: Quote Fee (OBO), tags: [obo, fee, quote], http: 'POST /api/quote_fee'}
+  - {id: counter_fee, name: Counter Fee (OBO), tags: [obo, fee, counter], http: 'POST /api/counter_fee (alias)'}
+  - {id: settle_fee, name: Settle Fee (x402 receipt), tags: [x402, fee, settle, receipt, USDT, USDC], http: 'POST /api/settle_fee'}
+  - {id: fill_hint, name: Fill Hint, tags: [fill, hint, catalog], http: 'GET /fill_hint.json'}
+  - {id: redeem, name: Redeem (one-shot), tags: [x402, redeem, defi, one-shot, promo], http: 'GET /api/echo?echo_id= with X-PAYMENT-TX + X-PAYMENT-CHAIN', flow: 'GET /index.json -> optional POST /api/quote_fee -> pay USDC on Base (or USDT on BSC) -> GET /api/echo with proof -> full echo + receipt'}
+  - {id: feedback, name: Agent Feedback, tags: [feedback, x402, bond, waiver, pheromone], http: 'POST /api/feedback'}
+  - {id: orphandust, name: OrphanDust Micro-SKU, tags: [orphandust, sku, unlock, x402], http: 'GET /ORPHANDUST.json; GET/POST /api/orphandust/buy (402)'}
+  - {id: buy_unlock, name: Buy Unlock Credits, tags: [orphandust, credits, unlock], http: 'POST /api/orphandust/buy -> POST /api/orphandust/unlock (alias of orphandust)'}
+interpretation: >-
+  A shape-conformant A2A 0.3.0 card that is really three things at once — an A2A discovery card,
+  an ERC-8004 off-chain registration file, and a machine-readable product sheet (fee schedule,
+  promo window, wallet, paywall rules) — for an API that has no A2A JSON-RPC door. Every skill is
+  reachable, but over plain HTTP with an x402 paywall, exactly as the skills' `endpoint`/`method`
+  keys say. An A2A client that reads `url` and sends message/send gets a 405; an agent that reads
+  the skills as an HTTP menu gets everything. Recorded as observed: the grade is the rubric's, the
+  reality is the note above, and the fix — an additionalInterfaces[] entry or a real JSON-RPC
+  endpoint — is the provider's.
+x-evidence:
+  fetched: '2026-09-19'
+  url: https://dualregistry.dev/.well-known/agent-card.json
+  http_status: 200
+  content_type: application/json; charset=utf-8
+  bytes: 16623
+  sha256: a38afd3f765a5ee689cd4a1d5b2e468b695834290bdd001e14e5f5e434b4a39c
+  body_shape: >-
+    JSON object carrying type (ERC-8004 registration-v1), name, description, url, version,
+    protocolVersion 0.3.0, provider, documentationUrl, capabilities (object), defaultInputModes,
+    defaultOutputModes, skills[11], services[13], endpoints[12], plus desk/x402/promo fields
+  negative_control:
+    url: https://dualregistry.dev/.well-known/dualregistry-dev-negative-control-c5a0ba2d.json
+    status: 404
+    content_type: text/plain; charset=utf-8
+    body: 'The page could not be found NOT_FOUND iad1::…'
+    verdict: 'Vercel 404 on a path that cannot exist; the 200 above is a served document, not an SPA catch-all.'
+  legacy_path:
+    url: https://dualregistry.dev/.well-known/agent.json
+    status: 404
+  root_alias:
+    url: https://dualregistry.dev/agent-card.json
+    status: 200
+    note: Same sha256.
+  www_host:
+    url: https://www.dualregistry.dev/.well-known/agent-card.json
+    status: 200
+    note: Same sha256.
+  alternate_host:
+    url: https://orphan-desk-echo.vercel.app/.well-known/agent-card.json
+    status: 200
+    note: Same sha256; named in the card's alternate_hosts[].
+  endpoint_probe:
+    url: https://dualregistry.dev/
+    get_status: 200
+    get_content_type: application/json; charset=utf-8
+    get_note: the echo catalog (same body as /index.json, 13,608 bytes)
+    post_method: tasks/get (JSON-RPC 2.0)
+    post_status: 405
+    post_note: empty body; no JSON-RPC routes
+  registry_listing:
+    registry: a2aregistry.org
+    note: >-
+      Surfaced by the a2aregistry.org harvest of 2026-09-19 (415 agents), which recorded this card
+      URL and two agents both named "Scro Orphan Desk". The provider's own DIRECTORY.json explains
+      the pair: a current listing (cc2b4f22-…, wellKnownURI on dualregistry.dev) and a superseded
+      legacy listing (13be19e9-…, registered 2026-09-15, wellKnownURI on the Vercel host, "cannot
+      be PATCHed without an Admin API key"). One agent, listed twice. Also verified/owned on
+      www.a2a-registry.org (38ed75fb-…) and proposed to wundercorp/awesome-agents (open PR #2).

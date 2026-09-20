@@ -1,23 +1,233 @@
 aid: dualregistry-dev
 name: Scro Orphan Desk
-description: 'Scro Orphan Desk is a company surfaced via the API Evangelist harvest backlog (source: a2a-registry)
-  and added to the network as a stub for full-pipeline profiling.'
+description: >-
+  Scro Orphan Desk is a machine-only "Intent Echo resurrection desk" served from dualregistry.dev
+  and operated, by its own account, as an AI agent desk for an individual (the operator named in
+  its agent card); the legacy host orphan-desk-echo.vercel.app serves the same bytes. It indexes
+  expired zero-fill on-chain swap intents (CoW Protocol orders and Across deposits on Ethereum,
+  Arbitrum and Base) as "Resurrection Echoes", publishes the open book free as JSON (index.json,
+  stats.json, fill_hint.json, PROMO.json, ORPHANDUST.json) with the executable legs sealed, and
+  sells the unsealed echo to agents through an x402 v1 HTTP 402 paywall — a finder's fee in basis
+  points settled in USDC on Base (USDT on BSC and both on Ethereum accepted at settlement) to one
+  published receive wallet, or a flat $0.50 "OrphanDust" unlock credit. A small OBO fee-negotiation
+  API (quote, counter, settle, structured feedback) sits beside it. Every surface is machine-first:
+  a served OpenAPI 3.0.3 stub (7 operations), an A2A 0.3.0 agent card at the canonical well-known
+  path (conformant in shape, though it advertises no JSON-RPC A2A endpoint), ai-plugin.json,
+  llms.txt, an x402 discovery document, a JSON Schema for fee quotes, and an "mcp.json" that is a
+  tool manifest rather than an MCP server. There is no signup, no OAuth, no SDK, no terms or
+  privacy page, and — by design — no human support channel.
 url: https://raw.githubusercontent.com/api-evangelist/dualregistry-dev/refs/heads/main/apis.yml
 x-type: company
 x-source: harvest:a2a-registry
-x-tier: stub
-x-tier-reason: harvest
+x-tier: profiled
+x-tier-reason: 'Full local enrichment pass 2026-09-19 (was: stub / harvest).'
 specificationVersion: '0.20'
 created: '2026-09-19'
 modified: '2026-09-19'
 tags:
-- Company
-apis: []
+- AI Agents
+- x402
+- A2A
+- DeFi
+- Crypto
+- Stablecoins
+- Payments
+- Intent Trading
+- Machine Economy
+- agent-native
+tags_raw:
+- ai-agents
+- x402
+- a2a
+- defi
+- crypto
+- stablecoins
+- payments
+- intent-trading
+- machine-economy
+- agent-native
+apis:
+- aid: dualregistry-dev:intent-echo-api
+  name: Scro Orphan Desk Intent Echo API
+  description: >-
+    The desk's HTTP/JSON surface on https://dualregistry.dev, described by a served OpenAPI 3.0.3
+    stub of 7 operations (the provider's own ai-plugin calls it "minimal") and more fully by
+    llms.txt: a free echo catalog (GET /index.json), pheromone stats (GET /stats.json), the x402
+    paywalled per-echo redeem (GET /api/echo?echo_id= — HTTP 402 invoice unless payment proof
+    headers X-PAYMENT-TX + X-PAYMENT-CHAIN accompany the GET; ?preview=1 is a free redacted
+    preview), OBO fee negotiation (POST /api/quote_fee, /api/counter_fee — exploratory quotes free,
+    firm accept answers 402), manual settlement attestation (POST /api/settle_fee), structured
+    agent feedback (POST /api/feedback) and the flat-priced OrphanDust unlock credits (GET/POST
+    /api/orphandust/buy answers 402 for od_unlock_050 at 0.50 USDC on Base). No authentication;
+    the paywall is the access control. Rate limits published as ~10 requests / 10 minutes on the
+    quote endpoints and 5 / 10 minutes on feedback.
+  humanURL: https://dualregistry.dev/llms.txt
+  baseURL: https://dualregistry.dev
+  tags:
+  - x402
+  - DeFi
+  - Intent Trading
+  - AI Agents
+  tags_raw:
+  - x402
+  - defi
+  - intent-trading
+  - ai-agents
+  properties:
+  - type: OpenAPI
+    url: openapi/dualregistry-dev-openapi.yml
+  - type: OpenAPI
+    name: OpenAPI (provider-hosted, verbatim copy at openapi/_original/)
+    url: https://dualregistry.dev/openapi.json
+  - type: Documentation
+    url: https://dualregistry.dev/llms.txt
+  - type: GettingStarted
+    name: Agent consumption guide
+    url: https://dualregistry.dev/AGENT.md
+  - type: JSONSchema
+    name: OBO fee quote / counter request+response schema (JSON Schema 2020-12)
+    url: json-schema/dualregistry-dev-fee-quote.schema.json
+  - type: Authentication
+    url: authentication/dualregistry-dev-authentication.yml
+  - type: Conventions
+    url: conventions/dualregistry-dev-conventions.yml
+  - type: ErrorCatalog
+    url: errors/dualregistry-dev-problem-types.yml
+  - type: DataModel
+    url: data-model/dualregistry-dev-data-model.yml
+  - type: Examples
+    url: examples/dualregistry-dev-examples.yml
+  - type: Overlay
+    url: overlays/dualregistry-dev-openapi-overlay.yaml
+  - type: RateLimits
+    url: rate-limits/dualregistry-dev-rate-limits.yml
+  - type: Lifecycle
+    url: lifecycle/dualregistry-dev-lifecycle.yml
+  - type: ToolCrosswalk
+    name: Binding of the provider's mcp.json tool manifest and agent-card skills to the OpenAPI (no live MCP server exists)
+    url: mcp/dualregistry-dev-tool-crosswalk.yml
+- aid: dualregistry-dev:a2a-agent
+  name: Scro Orphan Desk A2A agent card
+  description: >-
+    An A2A 0.3.0 agent card served at https://dualregistry.dev/.well-known/agent-card.json (and
+    byte-identical at /agent-card.json, on www. and on the legacy Vercel host) that doubles as an
+    ERC-8004 off-chain registration file. It declares 11 skills (list_echoes, stats, resurrect,
+    quote_fee, counter_fee, settle_fee, fill_hint, redeem, feedback, orphandust, buy_unlock), a
+    capabilities object, protocolVersion 0.3.0 and default JSON modes, and it grades conformant on
+    the A2A 1.0.0 hard checks — but its url is the site root, which serves index.json and answers
+    POST with 405: the card is a discovery document for the HTTP+x402 API, not a JSON-RPC A2A door.
+  humanURL: https://dualregistry.dev/llms.txt
+  baseURL: https://dualregistry.dev
+  tags:
+  - A2A
+  - AI Agents
+  - agent-native
+  tags_raw:
+  - a2a
+  - ai-agents
+  - agent-native
+  properties:
+  - type: AgentCard
+    url: a2a/dualregistry-dev-a2a.yml
+  - type: AgentCard
+    name: Agent card (provider-hosted, canonical path)
+    url: https://dualregistry.dev/.well-known/agent-card.json
+  - type: Documentation
+    url: https://dualregistry.dev/llms.txt
+common:
+- type: Website
+  url: https://dualregistry.dev/
+- type: Documentation
+  url: https://dualregistry.dev/llms.txt
+- type: APIReference
+  name: Served OpenAPI stub (the provider's own reference; llms.txt is the fuller one)
+  url: https://dualregistry.dev/openapi.json
+- type: GettingStarted
+  url: https://dualregistry.dev/AGENT.md
+- type: Pricing
+  name: Machine-readable fee schedule — PROMO.json (bps fee, promo window) and ORPHANDUST.json (flat unlock SKUs)
+  url: https://dualregistry.dev/PROMO.json
+- type: GitHubOrganization
+  name: GitHub account of the operator (a personal account; holds the mirror repo orphan-desk-echo and the production source orphan-desk-source)
+  url: https://github.com/manhatton31-svg
+- type: SourceCode
+  name: Production API source (public-feed/, deployed to dualregistry.dev)
+  url: https://github.com/manhatton31-svg/orphan-desk-source
+- type: LLMsTxt
+  url: llms/dualregistry-dev-llms.txt
+- type: WellKnown
+  url: well-known/dualregistry-dev-well-known.yml
+- type: AgentCard
+  url: a2a/dualregistry-dev-a2a.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: Authentication
+  url: authentication/dualregistry-dev-authentication.yml
+- type: Conventions
+  url: conventions/dualregistry-dev-conventions.yml
+- type: Conformance
+  url: conformance/dualregistry-dev-conformance.yml
+- type: ErrorCatalog
+  url: errors/dualregistry-dev-problem-types.yml
+- type: Lifecycle
+  url: lifecycle/dualregistry-dev-lifecycle.yml
+- type: Plans
+  url: plans/dualregistry-dev-plans-pricing.yml
+- type: RateLimits
+  url: rate-limits/dualregistry-dev-rate-limits.yml
+- type: DataModel
+  url: data-model/dualregistry-dev-data-model.yml
+- type: Examples
+  url: examples/dualregistry-dev-examples.yml
+- type: Overlay
+  url: overlays/dualregistry-dev-openapi-overlay.yaml
+- type: JSONSchema
+  url: json-schema/dualregistry-dev-fee-quote.schema.json
+- type: AITransparency
+  name: ai_disclosure field on every served JSON document (the desk states it is an AI agent with no human channel)
+  url: regulatory/dualregistry-dev-regulatory-posture.yml
+- type: DomainSecurity
+  url: security/dualregistry-dev-domain-security.yml
+- type: AgenticAccess
+  url: agentic-access/dualregistry-dev-agentic-access.yml
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
-common:
-- type: Website
-  url: https://dualregistry.dev/
+
+x-enrichment:
+  date: '2026-09-19'
+  status: enriched
+  artifacts_added: 30
+  pass: local-v3
+x-coverage:
+  state: covered
+  reason: null
+  detail: >-
+    Fully covered. dualregistry.dev serves an anonymous OpenAPI 3.0.3 stub (7 operations) at
+    /openapi.json, an A2A 0.3.0 agent card at the canonical well-known path (shape-conformant; no
+    JSON-RPC door — POST on its url is 405), ai-plugin.json, an x402 discovery document at
+    /.well-known/x402, llms.txt, AGENT.md, a JSON Schema for fee quotes, machine-readable pricing
+    (PROMO.json, ORPHANDUST.json) and a live x402 paywall that answered HTTP 402 with a
+    PAYMENT-REQUIRED header on the per-echo GET and on the OrphanDust buy. The provider's
+    production source is public on GitHub. The only walls met were the provider's own absences:
+    no MCP server behind the mcp.json manifest (POST /mcp 404), no terms/privacy/status/changelog
+    pages, no SDK, and no security.txt or OAuth metadata on any host.
+  evidence:
+    - url: https://dualregistry.dev/openapi.json
+      status: 200
+    - url: https://dualregistry.dev/.well-known/agent-card.json
+      status: 200
+    - url: https://dualregistry.dev/.well-known/ai-plugin.json
+      status: 200
+    - url: https://dualregistry.dev/.well-known/x402
+      status: 200
+    - url: https://dualregistry.dev/api/echo?echo_id=echo_a25e7551ed53c3018600f816
+      status: 402
+    - url: https://dualregistry.dev/mcp
+      status: 404
+      note: no MCP server behind the published mcp.json tool manifest
+    - url: https://dualregistry.dev/.well-known/security.txt
+      status: 404
+  checked: '2026-09-19'

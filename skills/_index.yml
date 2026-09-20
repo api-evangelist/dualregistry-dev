@@ -1,0 +1,27 @@
+generated: '2026-09-19'
+method: generated
+source: >-
+  openapi/dualregistry-dev-openapi.yml (operationIds pipeline-assigned — the served spec has none),
+  https://dualregistry.dev/llms.txt, https://dualregistry.dev/AGENT.md, the agent card's skills
+  (in particular the `redeem` skill's flow[]), the live 402 bodies and conventions/,
+  authentication/, errors/, rate-limits/ in this repository. No provider-published skill file
+  exists (/AGENTS.md 404; no SKILL.md anywhere; the card's skills[] are the closest thing and are
+  mirrored, not copied).
+note: >-
+  Every operationId below exists in openapi/dualregistry-dev-openapi.yml. Two documented paths the
+  skills need (POST /api/feedback, POST /api/orphandust/unlock) are NOT in the served spec and are
+  named as paths, not operationIds. No skill sends money on its own initiative: each one stops at
+  the 402 and tells the agent exactly what paying would commit it to, because reversibility is none.
+skills:
+  - file: dualregistry-dev-discover-and-preview-echoes.md
+    name: Discover and preview open echoes without paying
+    api: openapi/dualregistry-dev-openapi.yml
+    operations: [listEchoes, getStats, redeemEcho]
+  - file: dualregistry-dev-redeem-an-echo-with-x402.md
+    name: Redeem an echo through the x402 paywall (quote, pay, unlock, receipt)
+    api: openapi/dualregistry-dev-openapi.yml
+    operations: [listEchoes, redeemEcho, quoteFee, settleFee]
+  - file: dualregistry-dev-buy-an-orphandust-unlock.md
+    name: Buy a flat-priced OrphanDust unlock credit and spend it
+    api: openapi/dualregistry-dev-openapi.yml
+    operations: [getOrphanDustInvoice, buyOrphanDustCredits, redeemEcho]

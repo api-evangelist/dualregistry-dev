@@ -1,0 +1,53 @@
+generated: '2026-09-19'
+method: searched
+source: https://dualregistry.dev/llms.txt
+corroboration:
+  - 'GET https://dualregistry.dev/api/feedback (live, 200): "rate_limit": "5 / 10min per IP+UA"'
+  - 'agent card x402_paywall.rate_limit: "10 req / 10 min on quote_fee/counter_fee/fee_quote"; skill feedback: "Rate limit ~5/10min"'
+  - 'https://dualregistry.dev/fee_quote.schema.json description: "Rate limit ~10/10min"'
+  - 'github.com/manhatton31-svg/orphan-desk-source public-feed/api/_lib/rate_limit.js (WINDOW_MS 10 min, MAX_REQ 10, key sha256(ip|user-agent)) and negotiate.js line 451 (429 + Retry-After + reason rate_limited), feedback.js (429 + Retry-After)'
+  - 'response headers observed live on every probe 2026-09-19: no RateLimit-* / X-RateLimit-* header on success'
+checked: '2026-09-19'
+summary: >-
+  Published in the docs and readable in the provider's own source, but not signalled on success:
+  a fixed 10-minute window of 10 requests per IP+User-Agent hash on the three OBO quote endpoints,
+  and 5 per 10 minutes on POST /api/feedback. Exhaustion is HTTP 429 with a Retry-After header
+  (seconds to the end of the window) and a JSON body {status: reject, reason: rate_limited,
+  retry_after, note "Max 10 OBO quote requests per 10 minutes per IP/UA. Retry after Ns.", skill}.
+  No limit is published for the free GET surfaces (they are static JSON behind Cache-Control
+  public, max-age=30) or for /api/echo, settle_fee and the OrphanDust routes. No X-RateLimit-* or
+  IETF RateLimit header appears on any response, so an agent learns the budget from the docs and
+  the exhaustion from the 429 only. The 429 was not provoked by this pipeline.
+limit_count: 2
+scopes:
+  - scope: per-IP+User-Agent
+    surface: 'POST /api/quote_fee, POST /api/counter_fee, POST /api/fee_quote (quoteFee and its aliases)'
+    window: 10 minutes (fixed window, resets at window_start + 10 min)
+    limit: 10
+    burst: null
+    unit: requests
+    algorithm: 'fixed window per sha256(ip|user-agent) (rate_limit.js)'
+    status_on_exhaustion: 429
+    headers_on_exhaustion: ['Retry-After: <seconds>']
+    body_on_exhaustion: '{status: reject, decision: reject, reason: rate_limited, retry_after: <seconds>, note: "Max 10 OBO quote requests per 10 minutes per IP/UA. Retry after Ns.", skill: quote_fee}'
+    verbatim: 'Rate limit ~10/10min on quote endpoints'
+    source: https://dualregistry.dev/llms.txt
+  - scope: per-IP+User-Agent
+    surface: POST /api/feedback
+    window: 10 minutes
+    limit: 5
+    burst: null
+    unit: requests
+    status_on_exhaustion: 429
+    headers_on_exhaustion: ['Retry-After: <seconds>']
+    verbatim: '"rate_limit": "5 / 10min per IP+UA"'
+    source: https://dualregistry.dev/api/feedback (live GET self-description)
+    also: 'agent card skill feedback: "Rate limit ~5/10min"; one bond-waiver issuance per agent_id per 24h (one_waiver_per_agent_per_24h)'
+unlimited_or_unpublished:
+  - {surface: 'GET /index.json, /stats.json, /fill_hint.json and every static catalog', note: 'no limit published; static JSON, Cache-Control public max-age=30, Cloudflare in front'}
+  - {surface: 'GET /api/echo (redeemEcho), POST /api/settle_fee, GET/POST /api/orphandust/buy, POST /api/orphandust/unlock', note: 'no limit published in docs or source'}
+headers:
+  on_success: []
+  on_exhaustion: [Retry-After]
+  ietf_ratelimit: false
+  x_ratelimit: false

@@ -1,0 +1,66 @@
+generated: '2026-09-19'
+method: searched
+source: >-
+  openapi/dualregistry-dev-openapi.yml (no securitySchemes, no security — derive-authentication.py
+  produced nothing), upgraded from https://dualregistry.dev/llms.txt ("Per-Echo GET (x402 paywall)",
+  "OBO→pay"), https://dualregistry.dev/AGENT.md, the agent card's x402_paywall block,
+  well-known/dualregistry-dev-ai-plugin.json (auth {type: none}), well-known/dualregistry-dev-x402.json,
+  the live 402 responses on /api/echo and /api/orphandust/buy (headers + body), the CORS
+  Access-Control-Allow-Headers list observed on every /api/* response, and the provider's
+  vercel.json / verify_payment.js in github.com/manhatton31-svg/orphan-desk-source.
+docs: https://dualregistry.dev/llms.txt
+checked: '2026-09-19'
+summary:
+  types: [none, x402-payment-proof]
+  model: no-identity-payment-is-the-gate
+  model_note: >-
+    There is no authentication: no API key, no token, no OAuth, no signup, no account. The
+    ai-plugin manifest says auth {type: none} and the OpenAPI declares no securitySchemes. Access
+    control is economic — the free surfaces (index, stats, fill_hint, catalogs, previews,
+    exploratory quotes, non-open echoes) answer 200 to anyone, and the paid surface (an open echo's
+    unsealed legs, an OrphanDust credit) answers HTTP 402 with an x402 v1 invoice until the same
+    request is retried carrying proof of an on-chain stablecoin transfer to the desk's receive
+    wallet, which the server verifies against the chain ("fail-closed") before serving. Three proof
+    forms exist: payment-proof headers (or the equivalent query parameters), a quote_id that binds
+    a negotiated price, and a credit_token bought through OrphanDust.
+  oauth2: false
+  openid_connect: false
+  mtls: false
+  api_key_in: []
+  scopes: false
+  scopes_note: 'No scopes/ artifact and no OAuthScopes pointer: nothing declares oauth2 or any permission model.'
+schemes:
+- name: none
+  type: none
+  declared_in_spec: 'implicitly — no securitySchemes, no security requirement on any of the 7 operations'
+  applies_to: [listEchoes, getStats, 'redeemEcho with ?preview=1 or on a non-open echo', 'quoteFee exploratory (firm false/omitted)', 'GET /fill_hint.json, /PROMO.json, /ORPHANDUST.json, /PRODUCT.json, /SPOTLIGHT.json, /DIRECTORY.json, /MIRROR.json, /ACROSS.json', 'GET /api/feedback (self-description)']
+  sources: ['well-known/dualregistry-dev-ai-plugin.json auth.type none', 'https://dualregistry.dev/llms.txt']
+- name: x402-payment-proof
+  type: payment
+  standard: x402 v1
+  declared_in_spec: 'as the 402 responses on redeemEcho, quoteFee and buyOrphanDustCredits; not a securityScheme (OpenAPI has no type for it)'
+  applies_to: ['redeemEcho on an open echo (GET /api/echo?echo_id=, GET /*.echo.json)', 'quoteFee firm accept (402 invoice with quote_id)', 'buyOrphanDustCredits (402 for the SKU)']
+  challenge:
+    status: 402
+    headers_observed: ['PAYMENT-REQUIRED: <base64 JSON {x402Version: 1, accepts[]}>', 'x-payment-required: true', 'x402-asset: USDC', 'x402-network: eip155:8453', 'x402-pay-to: 0x459cF7359e37B45A0d2a2479656cD96cdA9F7dBb', 'x402-price: 0.50']
+    body: 'application/json type x402_payment_required with accepts[] (scheme exact, network eip155:8453 | base, USDC asset 0x8335…2913, maxAmountRequired in 6-decimal units, maxTimeoutSeconds 600) and accepted[] (USDC/Base preferred; USDT/BSC; USDC and USDT on Ethereum)'
+  proof:
+    headers: ['X-PAYMENT-TX (0x… transaction hash)', 'X-PAYMENT-CHAIN (base|bsc|ethereum)', 'X-PAYMENT-ASSET (USDC|USDT, optional)', 'X-PAYMENT-AMOUNT (optional)', 'X-PAYMENT-PAYER (optional)', 'X-PAYMENT (generic x402 header, allowed by CORS)', 'PAYMENT-TX / PAYMENT-CHAIN (unprefixed aliases, allowed by CORS)']
+    query_equivalents: [tx_hash, chain, asset, amount]
+    binding_headers: ['X-QUOTE-ID — binds a firm quote (final_usdc) to the unlock; quote TTL 20 minutes', 'X-CREDIT-TOKEN or ?credit_token=odc_… — spends one OrphanDust unlock credit instead of a per-echo fee', 'X-BOND-WAIVER — bond waiver id (bond is 0; kept for compatibility)']
+    verification_verbatim: 'Server RPC-verifies Transfer to fee wallet (fail-closed) then auto settle_fee.'
+    manual_path: 'POST /api/settle_fee {quote_id|echo_id, tx_hash, chain, amount_usdc|amount, asset?, payer?} -> receipt (same RPC verification)'
+  receive_wallet: 0x459cF7359e37B45A0d2a2479656cD96cdA9F7dBb
+  receive_wallet_note: 'One EVM address on Ethereum (eip155:1), Base (eip155:8453) and BSC (eip155:56); published in every JSON document, the x402 discovery file and the agent card''s agentWallet services.'
+  sources: ['https://dualregistry.dev/llms.txt', 'https://dualregistry.dev/.well-known/x402', 'live 402 on GET /api/echo?echo_id=echo_a25e7551ed53c3018600f816 (2026-09-19)', 'https://dualregistry.dev/AGENT.md step 6']
+- name: orphandust-credit-token
+  type: bearer-like-credit
+  declared_in_spec: false
+  applies_to: ['POST /api/orphandust/unlock {echo_id, credit_token}', 'GET /api/echo?echo_id=…&credit_token=odc_…']
+  how: 'Buy a SKU at POST /api/orphandust/buy (402 -> pay 0.50 USDC on Base -> retry with X-PAYMENT-TX + X-PAYMENT-CHAIN) and receive credits; a credit_token (prefix odc_) spends one credit per unlock. Refusals: invalid_credit_token, credit_expired, credit_exhausted (source orphandust.js). Credit TTL not published.'
+  sources: ['https://dualregistry.dev/ORPHANDUST.json', 'live 402 on GET /api/orphandust/buy', 'GET /api/orphandust/unlock -> 405 note']
+agent_guidance: >-
+  Do not look for a key. Read /index.json free, preview an echo free with ?preview=1, quote free
+  with firm omitted, and only when you intend to pay follow the 402: pay the accepts[] amount in
+  USDC on Base to payTo, then repeat the SAME request with X-PAYMENT-TX and X-PAYMENT-CHAIN. The
+  payment is an irreversible on-chain transfer — see conventions/ (reversibility: none).

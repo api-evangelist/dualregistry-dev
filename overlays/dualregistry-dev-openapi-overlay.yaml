@@ -1,0 +1,106 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancement overlay for the Scro Orphan Desk Intent Echo API
+  version: 1.0.0
+extends: openapi/_original/dualregistry-dev-openapi.json
+x-generated: '2026-09-19'
+x-method: generated
+x-source: openapi/_original/dualregistry-dev-openapi.json
+x-rationale: >-
+  The spec served at https://dualregistry.dev/openapi.json is real OpenAPI 3.0.3 and the provider
+  calls it a "minimal OpenAPI stub" in ai-plugin.json. It declares 7 operations over 6 paths with
+  summaries and bare response descriptions, and nothing else: no operationIds, no tags, no
+  parameters, no request bodies, no schemas, no securitySchemes, and GET /api/orphandust/buy has
+  no responses object at all (invalid against 3.0.3, which requires one). This overlay records
+  the enhancements API Evangelist applied in openapi/dualregistry-dev-openapi.yml — operationIds,
+  tags, the observed 402 on the response-less operation — and adds, as x- extensions, what the
+  provider publishes ELSEWHERE about these operations: the payment-proof headers and query
+  parameters (llms.txt, the 402 body, vercel.json), the x402 discovery document, the fee-quote
+  JSON Schema, the rate limits, and the documented paths the stub omits. Apply with any Overlay
+  1.0.0 processor against openapi/_original/dualregistry-dev-openapi.json.
+x-not-done: >-
+  No path is added (the documented /api/counter_fee, /api/fee_quote, /api/feedback,
+  /api/orphandust/unlock, /*.echo.json, /preview/{id} and the static catalogs are LISTED in an
+  x- extension, not modelled as operations), no request or response schema is invented, no
+  example payload is fabricated (observed responses are in examples/), and no security scheme is
+  added — the API has no authentication; x402 is not an OpenAPI security scheme type.
+actions:
+  - target: $.info
+    update:
+      x-apievangelist:
+        profile: https://github.com/api-evangelist/dualregistry-dev
+        enriched: '2026-09-19'
+        contract_status: 'provider-described stub; fuller surface documented in llms.txt'
+      x-discovery:
+        llms_txt: https://dualregistry.dev/llms.txt
+        agent_card: https://dualregistry.dev/.well-known/agent-card.json
+        ai_plugin: https://dualregistry.dev/.well-known/ai-plugin.json
+        x402: https://dualregistry.dev/.well-known/x402
+        tool_manifest: https://dualregistry.dev/mcp.json
+        agent_guide: https://dualregistry.dev/AGENT.md
+        fee_quote_schema: https://dualregistry.dev/fee_quote.schema.json
+      x-documented-paths-not-in-spec:
+        - 'POST /api/counter_fee (alias of quote_fee)'
+        - 'POST /api/fee_quote (alias of quote_fee)'
+        - 'POST /api/feedback (GET answers a self-description)'
+        - 'POST /api/orphandust/unlock'
+        - 'GET /*.echo.json and GET /preview/{echo_id} (rewritten to /api/echo)'
+        - 'GET /fill_hint.json, /PROMO.json, /fee_promo.json, /ORPHANDUST.json, /PRODUCT.json, /SPOTLIGHT.json, /DIRECTORY.json, /MIRROR.json, /ACROSS.json, /WELLKNOWN.json (static catalogs)'
+      x-rate-limits:
+        quote_endpoints: '10 requests / 10 minutes per IP+User-Agent hash; 429 with Retry-After and body reason rate_limited (source: llms.txt "~10/10min", api/_lib/rate_limit.js and negotiate.js in orphan-desk-source)'
+        feedback: '5 / 10 minutes per IP+UA; 429 with Retry-After (GET /api/feedback self-description; api/feedback.js)'
+  - target: $.paths['/index.json'].get
+    update:
+      operationId: listEchoes
+      tags: [Echoes]
+      x-access: free
+      x-response-note: 'JSON {desk, audience, schema_version, updated_at, receive_wallet, count_open, count_by_chain, stats_url, agent_card_url, echoes[], note}; echoes[].fill_hint.legs_locked is true on the free catalog.'
+  - target: $.paths['/stats.json'].get
+    update:
+      operationId: getStats
+      tags: [Stats]
+      x-access: free
+  - target: $.paths['/api/echo'].get
+    update:
+      operationId: redeemEcho
+      tags: [Echoes]
+      x-access: x402-paywalled
+      x-query-parameters-documented: [echo_id, preview, credit_token, tx_hash, chain, asset, amount]
+      x-payment-proof-headers: [X-PAYMENT-TX, X-PAYMENT-CHAIN, X-PAYMENT-ASSET, X-PAYMENT-AMOUNT, X-PAYMENT-PAYER, X-QUOTE-ID, X-CREDIT-TOKEN]
+      x-402-headers-observed: ['PAYMENT-REQUIRED (base64 x402 v1 accepts[])', x-payment-required, x402-asset, x402-network, x402-pay-to, x402-price]
+      x-observed: 'GET without echo_id -> 404 {status: reject, reason: echo_not_found}; with an open echo_id -> 402 x402 invoice; with &preview=1 -> 200 echo_preview (2026-09-19)'
+  - target: $.paths['/api/quote_fee'].post
+    update:
+      operationId: quoteFee
+      tags: [Fees]
+      x-request-schema: https://dualregistry.dev/fee_quote.schema.json#/oneOf/0
+      x-response-schema: https://dualregistry.dev/fee_quote.schema.json#/oneOf/1
+      x-aliases: ['/api/counter_fee', '/api/fee_quote']
+      x-observed: 'GET -> 405 {status: reject, reason: method_not_allowed, note: "POST JSON {echo_id, bid_bps, firm?, bond_tx_hash?, bid_usdc?, agent_id?, x402_payment_intent?}"}'
+      x-documented-outcomes: 'exploratory (firm false/omitted) -> 200 indicative; firm and bid_bps >= ask -> 402 accept invoice with quote_id; floor <= bid < ask -> 200 counter; bid < floor -> 422'
+  - target: $.paths['/api/settle_fee'].post
+    update:
+      operationId: settleFee
+      tags: [Fees]
+      x-request-body-documented: '{quote_id|echo_id, tx_hash, chain, amount_usdc|amount, asset?: USDC|USDT, payer?}'
+      x-observed: 'GET -> 405 with the body shape in the note'
+  - target: $.paths['/api/orphandust/buy'].get
+    update:
+      operationId: getOrphanDustInvoice
+      tags: [OrphanDust]
+      responses:
+        '402':
+          description: 'x402 payment required — observed live 2026-09-19 (the served spec declares no responses on this operation)'
+  - target: $.paths['/api/orphandust/buy'].post
+    update:
+      operationId: buyOrphanDustCredits
+      tags: [OrphanDust]
+      x-x402-resource: 'declared in https://dualregistry.dev/.well-known/x402 resources[0] (priceUsd 0.50, USDC on eip155:8453)'
+      x-request-body-documented: '{sku: od_unlock_050 | od_credits_1 | od_credits_2 | od_credits_3}; after paying, retry with X-PAYMENT-TX + X-PAYMENT-CHAIN'
+  - target: $
+    update:
+      tags:
+        - {name: Echoes, description: 'Open Intent Echoes — free catalog, x402-paywalled per-echo redeem'}
+        - {name: Stats, description: Pheromone stats}
+        - {name: Fees, description: OBO fee quote and settlement}
+        - {name: OrphanDust, description: 'Flat-priced unlock credits (x402)'}

@@ -1,0 +1,79 @@
+generated: '2026-09-19'
+method: searched
+source: >-
+  openapi/dualregistry-dev-openapi.yml (info.version 1.2.0), a2a/dualregistry-dev-agent-card.json
+  (version 1.2.0, updatedAt), well-known/dualregistry-dev-mcp-manifest.json (1.0.0),
+  https://dualregistry.dev/llms.txt ("Alternate (legacy)", "legacy skill name"),
+  https://dualregistry.dev/PROMO.json (starts_at/ends_at), https://dualregistry.dev/MIRROR.json,
+  https://dualregistry.dev/WELLKNOWN.json and DIRECTORY.json (playbook timestamps), the GitHub
+  repositories orphan-desk-echo (pushed 2026-09-17) and orphan-desk-source (pushed 2026-09-18), and
+  live probes of /status, /status.json, /changelog, /changelog.json, /CHANGELOG.md on 2026-09-19.
+checked: '2026-09-19'
+summary: >-
+  A days-old, fast-moving surface with no lifecycle policy: version 1.2.0 on the OpenAPI and the
+  card (1.0.0 on mcp.json), every document self-dated with an updated_at (index.json 20:07Z on the
+  probe day; card 2026-09-17; ai-plugin 2026-09-12; ORPHANDUST 2026-09-18), a public GitHub
+  source repo whose README describes the deploy cadence ("after every #1/#2/#3 patch"), but no
+  changelog, no deprecation policy, no Sunset or Deprecation headers, no SLA, no support window
+  and no status page (/status, /status.json 404). The legacy signals that DO exist are recorded
+  by the provider inline: the skill `resurrect` is "the legacy skill name" for `redeem`; the
+  Vercel hostname is "an optional alternate endpoint on the same Vercel project"; the older
+  a2aregistry listing is "LEGACY/SUPERSEDED"; the $0.10 quote bond in fee_quote.schema.json is
+  superseded by quote_bond_usdc 0 in PROMO.json and the card ("waiver code retained for
+  compatibility"). Time-bounded things are commercial, not API-lifecycle: the first-fill promo
+  window (2026-09-17 to 2026-09-24), a 20-minute quote TTL, each echo's expired_at. No
+  StatusPage, Deprecation or ChangeLog pointer is emitted.
+versioning:
+  scheme: info-version-plus-per-document-schema_version
+  api_path: none (no /v1 prefix; paths are /api/<name> and root JSON files)
+  spec_version: 1.2.0
+  spec_version_sources:
+    - 'openapi info.version: 1.2.0'
+    - 'agent card version: 1.2.0 (updatedAt 2026-09-17T21:53:08Z)'
+    - 'mcp.json version: 1.0.0'
+    - 'index.json schema_version: 1.0 (SCHEMA.md in the source says the Echo schema is 1.1.0)'
+    - 'fee_quote.schema.json / ORPHANDUST.json / PRODUCT.json schema_version: 1.0.0'
+    - '402 bodies and previews: schema_version 1.0.0'
+  breaking_change_policy: not-published
+  pinning: not-applicable
+  deploy_cadence_note: >-
+    The orphan-desk-source README says production is redeployed "after every #1/#2/#3 patch" —
+    the main branch of that repository auto-deploys its public-feed/ directory to dualregistry.dev.
+    The live feed is regenerated on a schedule (index.json updated_at 2026-09-19T20:07:15Z;
+    last-modified 20:11Z; Cache-Control public, max-age=30 on JSON; no-store on /api/*).
+deprecation:
+  policy_published: false
+  sunset_header: false
+  deprecation_header: false
+  deprecated_operations_in_spec: 0
+  inline_legacy_markers:
+    - {what: 'skill resurrect', status: 'legacy name; use redeem', source: 'https://dualregistry.dev/llms.txt ("resurrect — same economic path as redeem (legacy skill name)")'}
+    - {what: 'host orphan-desk-echo.vercel.app', status: 'alternate; canonical is dualregistry.dev', source: 'agent card alternate_note; llms.txt "Alternate (legacy)"'}
+    - {what: 'a2aregistry.org listing 13be19e9-…', status: 'superseded by cc2b4f22-…', source: 'https://dualregistry.dev/DIRECTORY.json'}
+    - {what: '$0.10 USDC quote bond', status: 'superseded — quote_bond_usdc 0; waiver kept for compatibility', source: 'PROMO.json bond_waiver.note vs fee_quote.schema.json description'}
+    - {what: 'OrphanDust packs od_credits_2/3', status: '"demoted" (worse per credit), still sold', source: 'https://dualregistry.dev/ORPHANDUST.json'}
+    - {what: 'HOOKS.md, FEEDBACK.json, PEER_PING.json, receipt.schema.json', status: 'referenced by robots.txt / docs, 404 live', source: 'live probes 2026-09-19'}
+status_page:
+  published: false
+  probes:
+    - {url: 'https://dualregistry.dev/status', status: 404}
+    - {url: 'https://dualregistry.dev/status.json', status: 404}
+  health_surface_note: 'GET /stats.json (updated_at, count_open, notional_usd_sum_open) is the closest thing to a heartbeat; it is a business metric document, not a status page.'
+changelog:
+  published: false
+  probes:
+    - {url: 'https://dualregistry.dev/changelog', status: 404}
+    - {url: 'https://dualregistry.dev/changelog.json', status: 404}
+    - {url: 'https://dualregistry.dev/CHANGELOG.md', status: 404}
+  note: 'The GitHub source repository''s commit history is the only change record; its README summarises the current "Grok Build #1" patch set.'
+sla:
+  published: false
+support_window:
+  published: false
+  note: 'No human support channel exists by design ("No email, Telegram, Discord, or human messaging"); feedback is a structured POST.'
+time_bounded_commitments:
+  - {what: first-fill promo, window: '2026-09-17T13:31:19Z to 2026-09-24T13:31:19Z ("active=true only while now < ends_at")', source: 'https://dualregistry.dev/PROMO.json'}
+  - {what: firm fee quote, window: '20 minutes (ttl_seconds 1200)', source: 'agent card obo_fee; llms.txt'}
+  - {what: x402 invoice, window: 'maxTimeoutSeconds 600', source: 'well-known/dualregistry-dev-x402.json accepts[]'}
+  - {what: each echo, window: 'until its expired_at (future TTL is part of the open-book gate)', source: 'index.json'}
+  - {what: bond waiver, window: '7 days, one use', source: 'PROMO.json bond_waiver'}

@@ -1,0 +1,126 @@
+generated: '2026-09-19'
+method: derived
+source: >-
+  well-known/dualregistry-dev-mcp-manifest.json (the provider's /mcp.json tool manifest, 6 tools) and
+  a2a/dualregistry-dev-agent-card.json (11 skills, each naming its HTTP endpoint and method), bound
+  against openapi/dualregistry-dev-openapi.yml (7 operations; operationIds pipeline-assigned — the
+  served spec has none) and the documented-but-unspecified paths in https://dualregistry.dev/llms.txt.
+checked: '2026-09-19'
+summary: >-
+  There is no live MCP server and no GraphQL, so this crosswalk binds the two agent-facing tool
+  lists the provider DOES publish — the mcp.json manifest and the agent card's skills — to the
+  served OpenAPI. Six of six manifest tools and 11 of 11 card skills name a real HTTP surface; 5
+  manifest tools and 7 card skills bind to one of the 7 spec operations, and the rest (feedback,
+  counter_fee, fill_hint, buy_unlock's unlock step) are documented HTTP endpoints the spec omits.
+  The gap runs the other way too: the spec is a stub, so every tool's real input contract comes
+  from llms.txt, the 402 body, the fee-quote JSON Schema and the 405 notes rather than from the
+  contract. Confidence is high where the tool names the same path the operation declares; medium
+  where the binding rests on the docs' description of an alias.
+coverage:
+  manifest_tools: 6
+  card_skills: 11
+  distinct_tools: 12
+  rest_operations: 7
+  tools_bound_to_spec: 8
+  bound_high: 7
+  bound_medium: 1
+  tools_bound_to_documented_only_paths: 4
+  mcp_only: 0
+  rest_operations_with_a_tool: 7
+  rest_only: 0
+  rest_ops_with_tool_pct: 100.0
+surfaces:
+  openapi:
+    file: openapi/dualregistry-dev-openapi.yml
+    original: openapi/_original/dualregistry-dev-openapi.json
+    live: https://dualregistry.dev/openapi.json
+    gated: false
+    operations: 7
+    note: 'A stub by the provider''s own description; omits /api/counter_fee, /api/fee_quote, /api/feedback, /api/orphandust/unlock, /*.echo.json, /preview/{id}, /fill_hint.json, /PROMO.json, /ORPHANDUST.json, /PRODUCT.json.'
+  mcp:
+    url: null
+    manifest: https://dualregistry.dev/mcp.json
+    tools_list_gated: not-applicable
+    tool_count: 6
+    raw: well-known/dualregistry-dev-mcp-manifest.json
+    note: 'A static tool manifest (name, method, url); no MCP endpoint (POST /mcp 404). No inputSchema anywhere.'
+  a2a:
+    url: null
+    card: a2a/dualregistry-dev-agent-card.json
+    skills: 11
+    note: 'No JSON-RPC door (POST / is 405); each skill names its HTTP endpoint and method, which is what this crosswalk binds.'
+  graphql: null
+crosswalk:
+  - tool: list_echoes
+    in: [manifest, card]
+    category: discovery
+    rest: [listEchoes]
+    binding: rest
+    confidence: high
+    note: 'GET /index.json — free; entries carry sealed legs (legs_locked: true).'
+  - tool: stats
+    in: [manifest, card]
+    category: discovery
+    rest: [getStats]
+    binding: rest
+    confidence: high
+  - tool: redeem
+    in: [manifest, card]
+    category: paid-read
+    rest: [redeemEcho]
+    binding: rest
+    confidence: high
+    note: 'GET /api/echo?echo_id=…; 402 x402 invoice unless X-PAYMENT-TX + X-PAYMENT-CHAIN (or ?tx_hash=&chain=, or credit_token) accompany it; ?preview=1 is the free redacted form. The card also documents /*.echo.json and /preview/{id}, which vercel.json/middleware rewrite to /api/echo.'
+  - tool: resurrect
+    in: [card]
+    category: paid-read
+    rest: [redeemEcho]
+    binding: rest
+    confidence: medium
+    note: 'llms.txt: "same economic path as redeem (legacy skill name)". Bound by that statement, not by a distinct path.'
+  - tool: quote_fee
+    in: [manifest, card]
+    category: negotiation
+    rest: [quoteFee]
+    binding: rest
+    confidence: high
+    note: 'Request/response shapes published in json-schema/dualregistry-dev-fee-quote.schema.json.'
+  - tool: settle_fee
+    in: [manifest, card]
+    category: settlement
+    rest: [settleFee]
+    binding: rest
+    confidence: high
+  - tool: orphandust
+    in: [card]
+    category: commerce
+    rest: [getOrphanDustInvoice, buyOrphanDustCredits]
+    binding: rest
+    confidence: high
+    note: 'GET /ORPHANDUST.json is the catalog (not in spec); GET/POST /api/orphandust/buy is the 402 door (in spec).'
+  - tool: buy_unlock
+    in: [card]
+    category: commerce
+    rest: [buyOrphanDustCredits]
+    binding: rest
+    confidence: high
+    note: 'Alias of orphandust for the buy step; its unlock step (POST /api/orphandust/unlock) is documented only.'
+documented_only:
+  - tool: feedback
+    in: [manifest, card]
+    path: POST /api/feedback
+    reason: 'Not in the served OpenAPI. GET on it answers a self-description (stages, outcomes, note_max, rate limit).'
+  - tool: counter_fee
+    in: [card]
+    path: POST /api/counter_fee
+    reason: 'Not in the served OpenAPI; documented as an alias of quote_fee with the same rules. /api/fee_quote is a third alias named in the card''s endpoints[].'
+  - tool: fill_hint
+    in: [card]
+    path: GET /fill_hint.json
+    reason: 'Not in the served OpenAPI; a free static catalog with legs_locked entries.'
+  - tool: buy_unlock (unlock step)
+    in: [card]
+    path: POST /api/orphandust/unlock
+    reason: 'Not in the served OpenAPI; GET answers 405 with the expected body {echo_id, credit_token}.'
+mcp_only: []
+rest_only: []
