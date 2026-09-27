@@ -21,6 +21,22 @@ x-type: company
 x-source: harvest:a2a-registry
 x-tier: profiled
 x-tier-reason: 'Full local enrichment pass 2026-09-19 (was: stub / harvest).'
+deliveryModel:
+  model: saas
+  license_evidence:
+    not_product:
+    - manhatton31-svg/orphan-desk-source
+  open_source: unknown
+  commercial: true
+  callable_host: true
+  label: Hosted service · you call their endpoint
+  confidence: low
+  source:
+  - openapi
+  - pricing
+  - repository-not-product
+  generated: '2026-09-25'
+  method: derived
 specificationVersion: '0.20'
 created: '2026-09-19'
 modified: '2026-09-19'
@@ -34,7 +50,7 @@ tags:
 - Payments
 - Intent Trading
 - Machine Economy
-- agent-native
+- Agent-Native
 tags_raw:
 - ai-agents
 - x402
@@ -47,81 +63,21 @@ tags_raw:
 - machine-economy
 - agent-native
 apis:
-- aid: dualregistry-dev:intent-echo-api
-  name: Scro Orphan Desk Intent Echo API
-  description: >-
-    The desk's HTTP/JSON surface on https://dualregistry.dev, described by a served OpenAPI 3.0.3
-    stub of 7 operations (the provider's own ai-plugin calls it "minimal") and more fully by
-    llms.txt: a free echo catalog (GET /index.json), pheromone stats (GET /stats.json), the x402
-    paywalled per-echo redeem (GET /api/echo?echo_id= — HTTP 402 invoice unless payment proof
-    headers X-PAYMENT-TX + X-PAYMENT-CHAIN accompany the GET; ?preview=1 is a free redacted
-    preview), OBO fee negotiation (POST /api/quote_fee, /api/counter_fee — exploratory quotes free,
-    firm accept answers 402), manual settlement attestation (POST /api/settle_fee), structured
-    agent feedback (POST /api/feedback) and the flat-priced OrphanDust unlock credits (GET/POST
-    /api/orphandust/buy answers 402 for od_unlock_050 at 0.50 USDC on Base). No authentication;
-    the paywall is the access control. Rate limits published as ~10 requests / 10 minutes on the
-    quote endpoints and 5 / 10 minutes on feedback.
-  humanURL: https://dualregistry.dev/llms.txt
-  baseURL: https://dualregistry.dev
-  tags:
-  - x402
-  - DeFi
-  - Intent Trading
-  - AI Agents
-  tags_raw:
-  - x402
-  - defi
-  - intent-trading
-  - ai-agents
-  properties:
-  - type: OpenAPI
-    url: openapi/dualregistry-dev-openapi.yml
-  - type: OpenAPI
-    name: OpenAPI (provider-hosted, verbatim copy at openapi/_original/)
-    url: https://dualregistry.dev/openapi.json
-  - type: Documentation
-    url: https://dualregistry.dev/llms.txt
-  - type: GettingStarted
-    name: Agent consumption guide
-    url: https://dualregistry.dev/AGENT.md
-  - type: JSONSchema
-    name: OBO fee quote / counter request+response schema (JSON Schema 2020-12)
-    url: json-schema/dualregistry-dev-fee-quote.schema.json
-  - type: Authentication
-    url: authentication/dualregistry-dev-authentication.yml
-  - type: Conventions
-    url: conventions/dualregistry-dev-conventions.yml
-  - type: ErrorCatalog
-    url: errors/dualregistry-dev-problem-types.yml
-  - type: DataModel
-    url: data-model/dualregistry-dev-data-model.yml
-  - type: Examples
-    url: examples/dualregistry-dev-examples.yml
-  - type: Overlay
-    url: overlays/dualregistry-dev-openapi-overlay.yaml
-  - type: RateLimits
-    url: rate-limits/dualregistry-dev-rate-limits.yml
-  - type: Lifecycle
-    url: lifecycle/dualregistry-dev-lifecycle.yml
-  - type: ToolCrosswalk
-    name: Binding of the provider's mcp.json tool manifest and agent-card skills to the OpenAPI (no live MCP server exists)
-    url: mcp/dualregistry-dev-tool-crosswalk.yml
 - aid: dualregistry-dev:a2a-agent
   name: Scro Orphan Desk A2A agent card
   description: >-
-    An A2A 0.3.0 agent card served at https://dualregistry.dev/.well-known/agent-card.json (and
-    byte-identical at /agent-card.json, on www. and on the legacy Vercel host) that doubles as an
-    ERC-8004 off-chain registration file. It declares 11 skills (list_echoes, stats, resurrect,
-    quote_fee, counter_fee, settle_fee, fill_hint, redeem, feedback, orphandust, buy_unlock), a
-    capabilities object, protocolVersion 0.3.0 and default JSON modes, and it grades conformant on
-    the A2A 1.0.0 hard checks — but its url is the site root, which serves index.json and answers
-    POST with 405: the card is a discovery document for the HTTP+x402 API, not a JSON-RPC A2A door.
+    An A2A 0.3.0 agent card served at https://dualregistry.dev/.well-known/agent-card.json (and byte-identical
+    at /agent-card.json, on www. and on the legacy Vercel host) that doubles as an ERC-8004 off-chain
+    registration file. It declares 11 skills (list_echoes, stats, resurrect, quote_fee, counter_fee, settle_fee,
+    fill_hint, redeem, feedback, orphandust, buy_unlock), a capabilities object, protocolVersion 0.3.0
+    and default JSON modes, and it grades conformant on the A2A 1.0.0 hard checks — but its url is the
+    site root, which serves index.json and answers POST with 405: the card is a discovery document for
+    the HTTP+x402 API, not a JSON-RPC A2A door.
   humanURL: https://dualregistry.dev/llms.txt
-  baseURL: https://dualregistry.dev
   tags:
   - A2A
   - AI Agents
-  - agent-native
+  - Agent-Native
   tags_raw:
   - a2a
   - ai-agents
@@ -134,6 +90,285 @@ apis:
     url: https://dualregistry.dev/.well-known/agent-card.json
   - type: Documentation
     url: https://dualregistry.dev/llms.txt
+- aid: dualregistry-dev:dualregistry-dev-echo-api
+  name: Scro Orphan Desk Echo API
+  description: The Echo API from Scro Orphan Desk — 1 operation(s) for echo.
+  humanURL: https://dualregistry.dev/llms.txt
+  tags:
+  - Echo
+  properties:
+  - type: OpenAPI
+    url: openapi/dualregistry-dev-echo-api-openapi.yml
+  - type: Documentation
+    url: https://dualregistry.dev/llms.txt
+  - type: GettingStarted
+    url: https://dualregistry.dev/AGENT.md
+  - type: JSONSchema
+    url: json-schema/dualregistry-dev-fee-quote.schema.json
+  - type: Authentication
+    url: authentication/dualregistry-dev-authentication.yml
+  - type: Conventions
+    url: conventions/dualregistry-dev-conventions.yml
+  - type: ErrorCatalog
+    url: errors/dualregistry-dev-problem-types.yml
+  - type: DataModel
+    url: data-model/dualregistry-dev-data-model.yml
+  - type: Examples
+    url: examples/dualregistry-dev-examples.yml
+  - type: RateLimits
+    url: rate-limits/dualregistry-dev-rate-limits.yml
+  - type: Lifecycle
+    url: lifecycle/dualregistry-dev-lifecycle.yml
+  - type: ToolCrosswalk
+    url: mcp/dualregistry-dev-tool-crosswalk.yml
+- aid: dualregistry-dev:dualregistry-dev-echoes-api
+  name: Scro Orphan Desk Echoes API
+  description: Open Intent Echoes — free catalog, x402-paywalled per-echo redeem
+  humanURL: https://dualregistry.dev/llms.txt
+  tags:
+  - Echoes
+  properties:
+  - type: OpenAPI
+    url: openapi/dualregistry-dev-echoes-api-openapi.yml
+  - type: Documentation
+    url: https://dualregistry.dev/llms.txt
+  - type: GettingStarted
+    url: https://dualregistry.dev/AGENT.md
+  - type: JSONSchema
+    url: json-schema/dualregistry-dev-fee-quote.schema.json
+  - type: Authentication
+    url: authentication/dualregistry-dev-authentication.yml
+  - type: Conventions
+    url: conventions/dualregistry-dev-conventions.yml
+  - type: ErrorCatalog
+    url: errors/dualregistry-dev-problem-types.yml
+  - type: DataModel
+    url: data-model/dualregistry-dev-data-model.yml
+  - type: Examples
+    url: examples/dualregistry-dev-examples.yml
+  - type: RateLimits
+    url: rate-limits/dualregistry-dev-rate-limits.yml
+  - type: Lifecycle
+    url: lifecycle/dualregistry-dev-lifecycle.yml
+  - type: ToolCrosswalk
+    url: mcp/dualregistry-dev-tool-crosswalk.yml
+- aid: dualregistry-dev:dualregistry-dev-fees-api
+  name: Scro Orphan Desk Fees API
+  description: OBO fee quote and settlement
+  humanURL: https://dualregistry.dev/llms.txt
+  tags:
+  - Fees
+  properties:
+  - type: OpenAPI
+    url: openapi/dualregistry-dev-fees-api-openapi.yml
+  - type: Documentation
+    url: https://dualregistry.dev/llms.txt
+  - type: GettingStarted
+    url: https://dualregistry.dev/AGENT.md
+  - type: JSONSchema
+    url: json-schema/dualregistry-dev-fee-quote.schema.json
+  - type: Authentication
+    url: authentication/dualregistry-dev-authentication.yml
+  - type: Conventions
+    url: conventions/dualregistry-dev-conventions.yml
+  - type: ErrorCatalog
+    url: errors/dualregistry-dev-problem-types.yml
+  - type: DataModel
+    url: data-model/dualregistry-dev-data-model.yml
+  - type: Examples
+    url: examples/dualregistry-dev-examples.yml
+  - type: RateLimits
+    url: rate-limits/dualregistry-dev-rate-limits.yml
+  - type: Lifecycle
+    url: lifecycle/dualregistry-dev-lifecycle.yml
+  - type: ToolCrosswalk
+    url: mcp/dualregistry-dev-tool-crosswalk.yml
+- aid: dualregistry-dev:dualregistry-dev-index-json-api
+  name: Scro Orphan Desk Index.json API
+  description: The Index.json API from Scro Orphan Desk — 1 operation(s) for index.json.
+  humanURL: https://dualregistry.dev/llms.txt
+  tags:
+  - Index.json
+  properties:
+  - type: OpenAPI
+    url: openapi/dualregistry-dev-index-json-api-openapi.yml
+  - type: Documentation
+    url: https://dualregistry.dev/llms.txt
+  - type: GettingStarted
+    url: https://dualregistry.dev/AGENT.md
+  - type: JSONSchema
+    url: json-schema/dualregistry-dev-fee-quote.schema.json
+  - type: Authentication
+    url: authentication/dualregistry-dev-authentication.yml
+  - type: Conventions
+    url: conventions/dualregistry-dev-conventions.yml
+  - type: ErrorCatalog
+    url: errors/dualregistry-dev-problem-types.yml
+  - type: DataModel
+    url: data-model/dualregistry-dev-data-model.yml
+  - type: Examples
+    url: examples/dualregistry-dev-examples.yml
+  - type: RateLimits
+    url: rate-limits/dualregistry-dev-rate-limits.yml
+  - type: Lifecycle
+    url: lifecycle/dualregistry-dev-lifecycle.yml
+  - type: ToolCrosswalk
+    url: mcp/dualregistry-dev-tool-crosswalk.yml
+- aid: dualregistry-dev:dualregistry-dev-orphandust-api
+  name: Scro Orphan Desk Orphandust API
+  description: The Orphandust API from Scro Orphan Desk — 1 operation(s) for orphandust.
+  humanURL: https://dualregistry.dev/llms.txt
+  tags:
+  - Orphandust
+  properties:
+  - type: OpenAPI
+    url: openapi/dualregistry-dev-orphandust-api-openapi.yml
+  - type: Documentation
+    url: https://dualregistry.dev/llms.txt
+  - type: GettingStarted
+    url: https://dualregistry.dev/AGENT.md
+  - type: JSONSchema
+    url: json-schema/dualregistry-dev-fee-quote.schema.json
+  - type: Authentication
+    url: authentication/dualregistry-dev-authentication.yml
+  - type: Conventions
+    url: conventions/dualregistry-dev-conventions.yml
+  - type: ErrorCatalog
+    url: errors/dualregistry-dev-problem-types.yml
+  - type: DataModel
+    url: data-model/dualregistry-dev-data-model.yml
+  - type: Examples
+    url: examples/dualregistry-dev-examples.yml
+  - type: RateLimits
+    url: rate-limits/dualregistry-dev-rate-limits.yml
+  - type: Lifecycle
+    url: lifecycle/dualregistry-dev-lifecycle.yml
+  - type: ToolCrosswalk
+    url: mcp/dualregistry-dev-tool-crosswalk.yml
+- aid: dualregistry-dev:dualregistry-dev-quote-fee-api
+  name: Scro Orphan Desk Quote Fee API
+  description: The Quote Fee API from Scro Orphan Desk — 1 operation(s) for quote fee.
+  humanURL: https://dualregistry.dev/llms.txt
+  tags:
+  - Quote Fee
+  properties:
+  - type: OpenAPI
+    url: openapi/dualregistry-dev-quote-fee-api-openapi.yml
+  - type: Documentation
+    url: https://dualregistry.dev/llms.txt
+  - type: GettingStarted
+    url: https://dualregistry.dev/AGENT.md
+  - type: JSONSchema
+    url: json-schema/dualregistry-dev-fee-quote.schema.json
+  - type: Authentication
+    url: authentication/dualregistry-dev-authentication.yml
+  - type: Conventions
+    url: conventions/dualregistry-dev-conventions.yml
+  - type: ErrorCatalog
+    url: errors/dualregistry-dev-problem-types.yml
+  - type: DataModel
+    url: data-model/dualregistry-dev-data-model.yml
+  - type: Examples
+    url: examples/dualregistry-dev-examples.yml
+  - type: RateLimits
+    url: rate-limits/dualregistry-dev-rate-limits.yml
+  - type: Lifecycle
+    url: lifecycle/dualregistry-dev-lifecycle.yml
+  - type: ToolCrosswalk
+    url: mcp/dualregistry-dev-tool-crosswalk.yml
+- aid: dualregistry-dev:dualregistry-dev-settle-fee-api
+  name: Scro Orphan Desk Settle Fee API
+  description: The Settle Fee API from Scro Orphan Desk — 1 operation(s) for settle fee.
+  humanURL: https://dualregistry.dev/llms.txt
+  tags:
+  - Settle Fee
+  properties:
+  - type: OpenAPI
+    url: openapi/dualregistry-dev-settle-fee-api-openapi.yml
+  - type: Documentation
+    url: https://dualregistry.dev/llms.txt
+  - type: GettingStarted
+    url: https://dualregistry.dev/AGENT.md
+  - type: JSONSchema
+    url: json-schema/dualregistry-dev-fee-quote.schema.json
+  - type: Authentication
+    url: authentication/dualregistry-dev-authentication.yml
+  - type: Conventions
+    url: conventions/dualregistry-dev-conventions.yml
+  - type: ErrorCatalog
+    url: errors/dualregistry-dev-problem-types.yml
+  - type: DataModel
+    url: data-model/dualregistry-dev-data-model.yml
+  - type: Examples
+    url: examples/dualregistry-dev-examples.yml
+  - type: RateLimits
+    url: rate-limits/dualregistry-dev-rate-limits.yml
+  - type: Lifecycle
+    url: lifecycle/dualregistry-dev-lifecycle.yml
+  - type: ToolCrosswalk
+    url: mcp/dualregistry-dev-tool-crosswalk.yml
+- aid: dualregistry-dev:dualregistry-dev-stats-api
+  name: Scro Orphan Desk Stats API
+  description: Pheromone stats
+  humanURL: https://dualregistry.dev/llms.txt
+  tags:
+  - Stats
+  properties:
+  - type: OpenAPI
+    url: openapi/dualregistry-dev-stats-api-openapi.yml
+  - type: Documentation
+    url: https://dualregistry.dev/llms.txt
+  - type: GettingStarted
+    url: https://dualregistry.dev/AGENT.md
+  - type: JSONSchema
+    url: json-schema/dualregistry-dev-fee-quote.schema.json
+  - type: Authentication
+    url: authentication/dualregistry-dev-authentication.yml
+  - type: Conventions
+    url: conventions/dualregistry-dev-conventions.yml
+  - type: ErrorCatalog
+    url: errors/dualregistry-dev-problem-types.yml
+  - type: DataModel
+    url: data-model/dualregistry-dev-data-model.yml
+  - type: Examples
+    url: examples/dualregistry-dev-examples.yml
+  - type: RateLimits
+    url: rate-limits/dualregistry-dev-rate-limits.yml
+  - type: Lifecycle
+    url: lifecycle/dualregistry-dev-lifecycle.yml
+  - type: ToolCrosswalk
+    url: mcp/dualregistry-dev-tool-crosswalk.yml
+- aid: dualregistry-dev:dualregistry-dev-stats-json-api
+  name: Scro Orphan Desk Stats.json API
+  description: The Stats.json API from Scro Orphan Desk — 1 operation(s) for stats.json.
+  humanURL: https://dualregistry.dev/llms.txt
+  tags:
+  - Stats.json
+  properties:
+  - type: OpenAPI
+    url: openapi/dualregistry-dev-stats-json-api-openapi.yml
+  - type: Documentation
+    url: https://dualregistry.dev/llms.txt
+  - type: GettingStarted
+    url: https://dualregistry.dev/AGENT.md
+  - type: JSONSchema
+    url: json-schema/dualregistry-dev-fee-quote.schema.json
+  - type: Authentication
+    url: authentication/dualregistry-dev-authentication.yml
+  - type: Conventions
+    url: conventions/dualregistry-dev-conventions.yml
+  - type: ErrorCatalog
+    url: errors/dualregistry-dev-problem-types.yml
+  - type: DataModel
+    url: data-model/dualregistry-dev-data-model.yml
+  - type: Examples
+    url: examples/dualregistry-dev-examples.yml
+  - type: RateLimits
+    url: rate-limits/dualregistry-dev-rate-limits.yml
+  - type: Lifecycle
+    url: lifecycle/dualregistry-dev-lifecycle.yml
+  - type: ToolCrosswalk
+    url: mcp/dualregistry-dev-tool-crosswalk.yml
 common:
 - type: Website
   url: https://dualregistry.dev/
@@ -231,3 +466,10 @@ x-coverage:
     - url: https://dualregistry.dev/.well-known/security.txt
       status: 404
   checked: '2026-09-19'
+x-a2a:
+  verified: true
+  probed: '2026-09-26'
+  url: "https://dualregistry.dev/.well-known/agent-card.json"
+  grade: "near-conformant"
+  protocol_version: "0.3.0"
+  control: 404

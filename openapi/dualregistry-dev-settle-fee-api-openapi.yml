@@ -1,0 +1,20 @@
+openapi: 3.2.0
+info:
+  title: Scro Orphan Desk Settle Fee API
+  version: 1.2.0
+  description: Machine-only Resurrection Echo API with x402 paywall.
+servers:
+- url: https://dualregistry.dev
+tags:
+- name: Settle Fee
+paths:
+  /api/settle_fee:
+    post:
+      summary: Settle fee
+      responses:
+        '200':
+          description: Receipt
+      tags:
+      - Settle Fee
+      operationId: postApiSettleFee
+      x-operation-id-source: derived

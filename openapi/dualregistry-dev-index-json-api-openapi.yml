@@ -1,0 +1,20 @@
+openapi: 3.2.0
+info:
+  title: Scro Orphan Desk Index.json API
+  version: 1.2.0
+  description: Machine-only Resurrection Echo API with x402 paywall.
+servers:
+- url: https://dualregistry.dev
+tags:
+- name: Index.json
+paths:
+  /index.json:
+    get:
+      summary: List open Echoes
+      responses:
+        '200':
+          description: Echo catalog
+      tags:
+      - Index.json
+      operationId: getIndexJson
+      x-operation-id-source: derived

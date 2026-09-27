@@ -1,0 +1,22 @@
+openapi: 3.2.0
+info:
+  title: Scro Orphan Desk Quote Fee API
+  version: 1.2.0
+  description: Machine-only Resurrection Echo API with x402 paywall.
+servers:
+- url: https://dualregistry.dev
+tags:
+- name: Quote Fee
+paths:
+  /api/quote_fee:
+    post:
+      summary: Request OBO fee quote
+      responses:
+        '200':
+          description: Counter or indicative quote
+        '402':
+          description: Payment required
+      tags:
+      - Quote Fee
+      operationId: postApiQuoteFee
+      x-operation-id-source: derived
