@@ -1,8 +1,7 @@
 {
   "provider": "dualregistry-dev",
   "sources": [
-    "_original/dualregistry-dev-openapi.json",
-    "dualregistry-dev-openapi.yml"
+    "_original/dualregistry-dev-openapi.json"
   ],
   "outputs": [
     "dualregistry-dev-echo-api-openapi.yml",
@@ -10,17 +9,15 @@
     "dualregistry-dev-orphandust-api-openapi.yml",
     "dualregistry-dev-quote-fee-api-openapi.yml",
     "dualregistry-dev-settle-fee-api-openapi.yml",
-    "dualregistry-dev-stats-json-api-openapi.yml",
-    "dualregistry-dev-echoes-api-openapi.yml",
-    "dualregistry-dev-fees-api-openapi.yml",
-    "dualregistry-dev-stats-api-openapi.yml"
+    "dualregistry-dev-stats-json-api-openapi.yml"
   ],
   "archived": [
-    "archived openapi/dualregistry-dev-openapi.yml"
+    "deleted 3 superseded output(s) from the previous generation"
   ],
   "errors": [],
   "warnings": [],
   "notes": [
+    "1 archived document(s) dropped as subsets of other archived documents",
     "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
     "dualregistry-dev-openapi.json: upgraded openapi 3.0.3 -> OpenAPI 3.2.0",
     "dualregistry-dev-openapi.json: tagged paths GET /index.json -> Index.json",
@@ -36,9 +33,19 @@
     "dualregistry-dev-openapi.json: declared missing tag: Quote Fee",
     "dualregistry-dev-openapi.json: declared missing tag: Settle Fee",
     "dualregistry-dev-openapi.json: declared missing tag: Stats.json",
-    "dualregistry-dev-openapi.yml: upgraded openapi 3.0.3 -> OpenAPI 3.2.0",
-    "tag 'Orphandust' spans 2 source specs (dualregistry-dev-openapi.json, dualregistry-dev-openapi.yml): per-path servers applied",
-    "apis.yml register: written (+9 apis, 10 total)"
+    "superseded outputs removed: dualregistry-dev-echoes-api-openapi.yml, dualregistry-dev-fees-api-openapi.yml, dualregistry-dev-stats-api-openapi.yml",
+    "apis.yml register: written (+0 apis, 7 total)"
   ],
-  "skipped": []
+  "skipped": [
+    "_original/dualregistry-dev-openapi.yml: archived document superseded by a larger archived document",
+    "dualregistry-dev-echo-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "dualregistry-dev-echoes-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "dualregistry-dev-fees-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "dualregistry-dev-index-json-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "dualregistry-dev-orphandust-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "dualregistry-dev-quote-fee-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "dualregistry-dev-settle-fee-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "dualregistry-dev-stats-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "dualregistry-dev-stats-json-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
 }
