@@ -79,3 +79,16 @@ plans:
       source: 'PROMO.json fees_collected_proof_usdc; llms.txt "Proof: fees_collected_usdc_sum already $0.25 on stats"' 
 enterprise_tier: none
 free_tier: 'all reads; there is nothing to sign up for'
+x-canonical:
+  generated: '2026-10-08'
+  vocabulary: all/0-working/economics/plans-canonical.yml
+  models:
+  - metered
+  units: []
+  plans:
+  - name: Pay per unlock (single public tier)
+    access: other
+    model: metered
+    model_how: derived
+    units: []
+    periods: []
