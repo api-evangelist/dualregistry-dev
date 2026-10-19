@@ -1,0 +1,12 @@
+{
+ "url": "https://dualregistry.dev/openapi.json",
+ "final": "https://dualregistry.dev/openapi.json",
+ "status": 200,
+ "content_type": "application/json; charset=utf-8",
+ "bytes": 1014,
+ "sha256": "43c2284dd7e84f24d0e29b836f917114b4e10bde69f29c92288ca00b3bb3e6e4",
+ "fetched_at": "2026-10-19",
+ "fetched_by": "APIEvangelist-Harvest/1.0 (+https://apievangelist.com)",
+ "match": "byte-identical",
+ "note": "re-archived: the provider's current document replaced a stale archive (roadmap#793); the old files are in openapi/_superseded/2026-10-19-stale"
+}

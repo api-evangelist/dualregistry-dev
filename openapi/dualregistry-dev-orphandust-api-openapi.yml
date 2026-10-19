@@ -9,12 +9,6 @@ tags:
 - name: Orphandust
 paths:
   /api/orphandust/buy:
-    get:
-      summary: HTTP 402 invoice for od_unlock_050 ($0.50 USDC Base)
-      tags:
-      - Orphandust
-      operationId: getApiOrphandustBuy
-      x-operation-id-source: derived
     post:
       summary: Buy unlock credits
       responses:

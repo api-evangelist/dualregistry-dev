@@ -15,7 +15,6 @@
   "errors": [],
   "warnings": [],
   "notes": [
-    "1 archived document(s) dropped as subsets of other archived documents",
     "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
     "dualregistry-dev-openapi.json: upgraded openapi 3.0.3 -> OpenAPI 3.2.0",
     "dualregistry-dev-openapi.json: tagged paths GET /index.json -> Index.json",
@@ -23,7 +22,6 @@
     "dualregistry-dev-openapi.json: tagged paths GET /api/echo -> Echo",
     "dualregistry-dev-openapi.json: tagged paths POST /api/quote_fee -> Quote Fee",
     "dualregistry-dev-openapi.json: tagged paths POST /api/settle_fee -> Settle Fee",
-    "dualregistry-dev-openapi.json: tagged paths GET /api/orphandust/buy -> Orphandust",
     "dualregistry-dev-openapi.json: tagged paths POST /api/orphandust/buy -> Orphandust",
     "dualregistry-dev-openapi.json: declared missing tag: Echo",
     "dualregistry-dev-openapi.json: declared missing tag: Index.json",
@@ -33,13 +31,5 @@
     "dualregistry-dev-openapi.json: declared missing tag: Stats.json",
     "apis.yml register: already-registered"
   ],
-  "skipped": [
-    "_original/dualregistry-dev-openapi.yml: archived document superseded by a larger archived document",
-    "dualregistry-dev-echo-api-openapi.yml: previously refined output, superseded by openapi/_original/",
-    "dualregistry-dev-index-json-api-openapi.yml: previously refined output, superseded by openapi/_original/",
-    "dualregistry-dev-orphandust-api-openapi.yml: previously refined output, superseded by openapi/_original/",
-    "dualregistry-dev-quote-fee-api-openapi.yml: previously refined output, superseded by openapi/_original/",
-    "dualregistry-dev-settle-fee-api-openapi.yml: previously refined output, superseded by openapi/_original/",
-    "dualregistry-dev-stats-json-api-openapi.yml: previously refined output, superseded by openapi/_original/"
-  ]
+  "skipped": []
 }

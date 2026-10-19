@@ -1,0 +1,20 @@
+openapi: 3.2.0
+info:
+  title: Scro Orphan Desk Stats.json API
+  version: 1.2.0
+  description: Machine-only Resurrection Echo API with x402 paywall.
+servers:
+- url: https://dualregistry.dev
+tags:
+- name: Stats.json
+paths:
+  /stats.json:
+    get:
+      summary: Read pheromone stats
+      responses:
+        '200':
+          description: Stats
+      tags:
+      - Stats.json
+      operationId: getStatsJson
+      x-operation-id-source: derived

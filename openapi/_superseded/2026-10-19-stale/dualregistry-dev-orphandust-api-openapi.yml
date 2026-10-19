@@ -1,0 +1,28 @@
+openapi: 3.2.0
+info:
+  title: Scro Orphan Desk Orphandust API
+  version: 1.2.0
+  description: Machine-only Resurrection Echo API with x402 paywall.
+servers:
+- url: https://dualregistry.dev
+tags:
+- name: Orphandust
+paths:
+  /api/orphandust/buy:
+    get:
+      summary: HTTP 402 invoice for od_unlock_050 ($0.50 USDC Base)
+      tags:
+      - Orphandust
+      operationId: getApiOrphandustBuy
+      x-operation-id-source: derived
+    post:
+      summary: Buy unlock credits
+      responses:
+        '200':
+          description: Credits
+        '402':
+          description: Payment required
+      tags:
+      - Orphandust
+      operationId: postApiOrphandustBuy
+      x-operation-id-source: derived
