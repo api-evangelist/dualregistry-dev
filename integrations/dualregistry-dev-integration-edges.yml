@@ -14,7 +14,7 @@ edges:
     registered_name: dev.dualregistry/registry
     register_id: dev.dualregistry/registry
     detected_by: sweep-agent-tools.py
-    detected: '2026-10-15'
+    detected: '2026-10-19'
   mcp_registry:
     servers:
     - dev.dualregistry/registry
@@ -59,7 +59,7 @@ edges:
     matched_domain: dualregistry.dev
     matched_by: own-domain
     detected_by: sweep-ai-agents.py
-    detected: '2026-10-15'
+    detected: '2026-10-19'
   detected_by: sweep-ai-agents.py
   first_seen: '2026-10-15'
 - partner_name: a2aregistry.org
@@ -95,13 +95,67 @@ edges:
     sample_agents:
     - Scro Orphan Desk
     detected_by: sweep-ai-agents.py
-    detected: '2026-10-15'
+    detected: '2026-10-19'
   detected_by: sweep-ai-agents.py
   first_seen: '2026-10-15'
+- partner_name: x402 protocol (live 402 probe)
+  partner: null
+  partner_match: register
+  type: register
+  channel: standard-directory
+  relationship: standard-participant
+  direction: partner-built
+  evidence: https://dualregistry.dev/api/orphandust/buy
+  category: x402 pay-per-call conformance (observed)
+  contract_reference:
+    register: live x402 probe (unauthenticated request to a documented paid resource + negative control)
+    standard: x402
+    spec_file: null
+    role: x402-resource-server
+    matched_by: repo
+    certified_products:
+    - product: 'x402 resource server: payment challenge observed'
+      product_type: x402 resource server
+      lapsed: false
+      observed: '2026-10-21'
+      probe_url: https://dualregistry.dev/api/orphandust/buy
+      probe_method: GET
+      evidence:
+      - header:payment-required
+      - header:x-payment-required
+      - body:x402Version
+      - body:accepts[scheme,payTo,asset]
+      negative_control_status: 404
+    probes:
+    - url: https://dualregistry.dev/api/echo
+      method: GET
+      status: 404
+    - url: https://dualregistry.dev/index.json
+      method: GET
+      status: 200
+    - url: https://dualregistry.dev/api/orphandust/buy
+      method: GET
+      status: 402
+    signal_note: 'conformance OBSERVED, not certified by a body: 402 plus an x402 header or a complete accepts[]
+      body, and a negative control on the same host not challenged; one entry per product type'
+    detected_by: sweep-x402-micropayments.py
+    detected: '2026-10-21'
+  detected_by: sweep-x402-micropayments.py
+  first_seen: '2026-10-21'
 generated: '2026-10-14'
 method: searched
 checked:
 - https://a2aregistry.org/api/agents
 - https://registry.modelcontextprotocol.io/v0/servers
+- https://agentic.market
+- https://api.cdp.coinbase.com/platform/v2/x402/discovery/resources
+- https://app.ampersend.ai/discover
+- https://docs.cdp.coinbase.com/x402/
+- https://docs.x402.org/dev-tools/facilitators
+- https://pay.sh
+- https://www.x402.org/ecosystem
+- https://x402-list.com
+- https://x402.org/members/
+- https://x402scan.com
 source:
 - https://a2aregistry.org/api/agents

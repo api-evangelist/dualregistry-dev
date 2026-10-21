@@ -19,6 +19,97 @@
     registered_name: dev.dualregistry/registry
     register_id: dev.dualregistry/registry
     detected_by: sweep-agent-tools.py
-    detected: '2026-10-15'
+    detected: '2026-10-19'
+  status: not-a-workflow
+  arazzo: null
+- slug: dualregistry-dev-a2a-protocol-own-agent-card
+  label: A2A protocol (own Agent Card)
+  partner_name: A2A protocol (own Agent Card)
+  category: A2A agent
+  type: register
+  channel: provider-built
+  evidence: https://dualregistry.dev/.well-known/agent-card.json
+  source: edge
+  relationship: compatible
+  contract_reference:
+    register: provider's own /.well-known/agent-card.json
+    spec_file: null
+    standard: A2A
+    role: a2a-agent-card
+    registered_name: Scro Orphan Desk
+    organization: Scro Orphan Desk
+    matched_domain: dualregistry.dev
+    matched_by: own-domain
+    detected_by: sweep-ai-agents.py
+    detected: '2026-10-19'
+  status: not-a-workflow
+  arazzo: null
+- slug: dualregistry-dev-a2aregistry-org
+  label: a2aregistry.org
+  partner_name: a2aregistry.org
+  category: A2A agent registry
+  type: register
+  channel: standard-directory
+  evidence: https://a2aregistry.org/api/agents/cc2b4f22-8b5a-49dc-8a74-42a2b4f5b25f
+  source: edge
+  relationship: compatible
+  contract_reference:
+    register: a2aregistry.org /api/agents
+    spec_file: null
+    standard: A2A
+    role: a2a-registry-listing
+    registered_name: Scro Orphan Desk
+    matched_domain: dualregistry.dev
+    matched_by: domain+repo-name
+    matched_via: card-host
+    listings_context: 1
+    sample_agents:
+    - Scro Orphan Desk
+    detected_by: sweep-ai-agents.py
+    detected: '2026-10-19'
+  status: not-a-workflow
+  arazzo: null
+- slug: dualregistry-dev-x402-protocol-live-402-probe
+  label: x402 protocol (live 402 probe)
+  partner_name: x402 protocol (live 402 probe)
+  category: x402 pay-per-call conformance (observed)
+  type: register
+  channel: standard-directory
+  evidence: https://dualregistry.dev/api/orphandust/buy
+  source: edge
+  relationship: standard-participant
+  contract_reference:
+    register: live x402 probe (unauthenticated request to a documented paid resource + negative control)
+    standard: x402
+    spec_file: null
+    role: x402-resource-server
+    matched_by: repo
+    certified_products:
+    - product: 'x402 resource server: payment challenge observed'
+      product_type: x402 resource server
+      lapsed: false
+      observed: '2026-10-21'
+      probe_url: https://dualregistry.dev/api/orphandust/buy
+      probe_method: GET
+      evidence:
+      - header:payment-required
+      - header:x-payment-required
+      - body:x402Version
+      - body:accepts[scheme,payTo,asset]
+      negative_control_status: 404
+    probes:
+    - url: https://dualregistry.dev/api/echo
+      method: GET
+      status: 404
+    - url: https://dualregistry.dev/index.json
+      method: GET
+      status: 200
+    - url: https://dualregistry.dev/api/orphandust/buy
+      method: GET
+      status: 402
+    signal_note: 'conformance OBSERVED, not certified by a body: 402 plus an x402 header or a complete accepts[]
+      body, and a negative control on the same host not challenged; one entry per product type'
+    detected_by: sweep-x402-micropayments.py
+    detected: '2026-10-21'
   status: not-a-workflow
   arazzo: null
